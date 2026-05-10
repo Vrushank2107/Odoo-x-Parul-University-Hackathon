@@ -1,165 +1,136 @@
-# Traveloop - Travel Planning Application
+# Traveloop
+
+Travel planning app for the **Odoo × Parul University Hackathon** — plan trips, itineraries, budgets, packing, and collaboration in one place.
+
+> In this repository, all application code lives under the `traveloop/` folder. Clone the repo, then `cd traveloop` for setup and run commands below.
 
 ## Overview
-Traveloop is a comprehensive travel planning application built with a modern web stack. The application provides a user-friendly interface for planning, organizing, and managing travel experiences.
 
-## Technology Stack
+Traveloop is a full-stack travel planner: React + Vite on the frontend and a Python API on the backend, with an AI layer (e.g. Gemini integration and trip/recommendation helpers under `backend/app/ai/`).
+
+## Tech stack
+
+| Layer | Technologies |
+|--------|----------------|
+| Frontend | React, Vite, JavaScript/JSX, CSS |
+| Backend | Python, Flask-style app package under `backend/app/` |
+| Data & services | Models, services, and route modules per feature area |
+| AI | `app/ai/` — client, memory, recommendation engine, trip agent, website context |
+| Ops | `Dockerfile` and `docker-compose.yml` (fill in when you wire container builds) |
+
+## Repository layout
+
+```
+traveloop/
+├── frontend/                 # React (Vite) SPA
+├── backend/
+│   ├── app/
+│   │   ├── ai/               # LLM / trip intelligence
+│   │   ├── config/           # Settings
+│   │   ├── middleware/       # Auth & role middleware
+│   │   ├── models/           # Domain models
+│   │   ├── routes/           # HTTP API routes
+│   │   ├── schemas/          # Request/response schemas
+│   │   ├── services/         # Business logic
+│   │   └── utils/            # Helpers, logging, mail, errors
+│   ├── requirements.txt
+│   ├── run.py                # Backend entry
+│   └── .env                  # Local secrets (do not commit real keys)
+├── Dockerfile
+├── docker-compose.yml
+└── README.md
+```
+
+### Frontend (`frontend/src/`)
+
+```
+src/
+├── api/                 # HTTP client (e.g. axios setup)
+├── components/        # UI pieces (Navbar, Sidebar, cards, charts, Loader)
+│   └── Chatbot/       # ChatButton, ChatPopup
+├── context/           # AuthContext, TripContext
+├── hooks/             # useAuth, useTrip
+├── layouts/           # MainLayout, DashboardLayout
+├── pages/             # Feature screens (Home, Dashboard, trips, budget, etc.)
+├── routes/            # ProtectedRoutes
+├── utils/             # auth, budget helpers
+├── App.jsx
+├── main.jsx
+└── index.css
+```
+
+### Backend (`backend/app/`)
+
+- **Routes**: `auth`, `trip`, `itinerary`, `activity`, `city`, `budget`, `notes`, `packing`, `share`, `admin`, `ai`
+- **Services**: auth, trip, itinerary, budget, AI, recommendations
+- **Models**: user, trip, itinerary, activity, city, budget, notes, packing, shared trip
+
+## Features (by area)
+
+- **Auth**: Login, Signup; protected routes on the frontend
+- **Trips**: Create, list (“My Trips”), shared trips, itinerary builder and view
+- **Planning**: Activity search, city search, budget, notes, packing checklist
+- **Account**: Profile; **Admin**: Admin dashboard
+- **UI**: Navbar, sidebar, trip/activity cards, budget chart, chatbot entry points
+
+## Prerequisites
+
+- Node.js and npm (for the frontend)
+- Python 3.x and pip (for the backend)
+- Optional: Docker and Docker Compose when your `Dockerfile` / compose file are populated
+
+## Local development
+
+From the **repository root**:
+
+```bash
+cd traveloop
+```
 
 ### Frontend
-- **Framework**: React
-- **Build Tool**: Vite
-- **Styling**: CSS
-- **Language**: JavaScript/JSX
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
 ### Backend
-- **Framework**: Python
-- **Package Management**: pip (requirements.txt)
 
-### DevOps
-- **Containerization**: Docker
-- **Orchestration**: Docker Compose
-
-## Application Structure
-
-### Frontend Architecture (`/frontend`)
-```
-frontend/src/
-├── components/          # Reusable UI components
-│   ├── ActivityCard.jsx
-│   ├── BudgetChart.jsx
-│   ├── Chatbot/         # Chatbot functionality
-│   ├── Loader.jsx
-│   ├── Navbar.jsx
-│   ├── Sidebar.jsx
-│   └── TripCard.jsx
-├── pages/              # Application pages/routes
-│   ├── ActivitySearch.jsx
-│   ├── AdminDashboard.jsx
-│   ├── Budget.jsx
-│   ├── CitySearch.jsx
-│   ├── CreateTrip.jsx
-│   ├── Dashboard.jsx
-│   ├── Home.jsx
-│   ├── ItineraryBuilder.jsx
-│   ├── ItineraryView.jsx
-│   ├── Login.jsx
-│   ├── MyTrips.jsx
-│   ├── Notes.jsx
-│   ├── PackingChecklist.jsx
-│   ├── Profile.jsx
-│   ├── SharedTrip.jsx
-│   └── Signup.jsx
-├── layouts/            # Layout components
-├── context/            # React context providers
-├── hooks/              # Custom React hooks
-├── api/                # API integration layer
-├── routes/             # Route definitions
-├── utils/              # Utility functions
-├── App.jsx             # Main application component
-├── main.jsx            # Application entry point
-└── index.css           # Global styles
-```
-
-### Backend Architecture (`/backend`)
-```
-backend/
-├── app/                # Main application logic
-├── .env                # Environment variables
-├── requirements.txt    # Python dependencies
-└── run.py             # Application entry point
-```
-
-## Key Features & Pages
-
-### User Authentication
-- **Login Page** (`Login.jsx`) - User authentication
-- **Signup Page** (`Signup.jsx`) - New user registration
-
-### Main Navigation
-- **Home Page** (`Home.jsx`) - Landing page and main navigation
-- **Dashboard** (`Dashboard.jsx`) - User dashboard with overview
-
-### Trip Management
-- **Create Trip** (`CreateTrip.jsx`) - Create new travel plans
-- **My Trips** (`MyTrips.jsx`) - View and manage personal trips
-- **Shared Trip** (`SharedTrip.jsx`) - Collaborative trip planning
-- **Itinerary Builder** (`ItineraryBuilder.jsx`) - Build detailed itineraries
-- **Itinerary View** (`ItineraryView.jsx`) - View trip itineraries
-
-### Planning Tools
-- **Activity Search** (`ActivitySearch.jsx`) - Search for activities
-- **City Search** (`CitySearch.jsx`) - Explore destinations
-- **Budget** (`Budget.jsx`) - Budget planning and tracking
-- **Notes** (`Notes.jsx`) - Travel notes and documentation
-- **Packing Checklist** (`PackingChecklist.jsx`) - Packing organization
-
-### User Features
-- **Profile** (`Profile.jsx`) - User profile management
-- **Admin Dashboard** (`AdminDashboard.jsx`) - Administrative interface
-
-### UI Components
-- **Navbar** - Navigation header
-- **Sidebar** - Side navigation menu
-- **Trip Cards** - Trip display cards
-- **Activity Cards** - Activity display cards
-- **Budget Charts** - Financial visualization
-- **Chatbot** - Interactive assistance
-- **Loader** - Loading states
-
-## Development Setup
-
-### Prerequisites
-- Node.js and npm
-- Python and pip
-- Docker and Docker Compose
-
-### Installation
-1. Clone the repository
-2. Install frontend dependencies:
-   ```bash
-   cd frontend
-   npm install
-   ```
-3. Install backend dependencies:
-   ```bash
-   cd backend
-   pip install -r requirements.txt
-   ```
-
-### Running the Application
-
-#### Development Mode
-1. Start the backend server:
-   ```bash
-   cd backend
-   python run.py
-   ```
-2. Start the frontend development server:
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-
-#### Docker Mode
 ```bash
-docker-compose up
+cd backend
+pip install -r requirements.txt
 ```
 
-## Application Flow
-1. Users authenticate through Login/Signup pages
-2. Navigate to Dashboard for overview
-3. Create and manage trips through trip management pages
-4. Use planning tools for detailed trip organization
-5. Access profile and administrative features as needed
+Configure environment variables in `backend/.env` (API URLs, database, and any AI keys your `settings` module expects). Then start the app:
 
-## Containerization
-The application is fully containerized with:
-- **Dockerfile** - Container configuration
-- **docker-compose.yml** - Multi-container orchestration
+```bash
+python run.py
+```
 
-## File Structure Summary
-- **Frontend**: React-based single-page application
-- **Backend**: Python API server
-- **Components**: Modular, reusable UI elements
-- **Pages**: Feature-specific application screens
-- **Utilities**: Helper functions and shared logic
+Run backend and frontend in two terminals. Point the frontend API client at your backend base URL if it is not the default.
+
+### Docker
+
+When `Dockerfile` and `docker-compose.yml` are configured, you can use:
+
+```bash
+docker compose up
+```
+
+(from `traveloop/`, depending on your Compose file version and service names).
+
+## Typical user flow
+
+1. Sign up or log in  
+2. Open the dashboard and create or open a trip  
+3. Build an itinerary, search cities/activities, and track budget, notes, and packing  
+4. Use sharing and admin features as roles allow  
+
+## Contributing / hackathon notes
+
+Keep secrets out of git: use `backend/.env` locally and document any new variables in this README or in a template `.env.example` if you add one.
+
+---
+
+*Odoo × Parul University Hackathon — Traveloop*
