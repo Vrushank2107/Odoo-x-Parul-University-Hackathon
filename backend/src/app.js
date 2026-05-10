@@ -47,6 +47,7 @@ const allowedOrigins = new Set([
   'http://127.0.0.1:50702',
   'http://localhost:5173'
 ])
+const vercelPreviewPattern = /^https:\/\/.*\.vercel\.app$/
 
 // CORS configuration
 app.use(cors({
@@ -54,6 +55,7 @@ app.use(cors({
     // Allow non-browser requests and same-origin server requests
     if (!origin) return callback(null, true)
     if (allowedOrigins.has(origin)) return callback(null, true)
+    if (vercelPreviewPattern.test(origin)) return callback(null, true)
     return callback(new Error(`CORS blocked for origin: ${origin}`))
   },
   credentials: true,
