@@ -103,7 +103,7 @@ const CreateTrip = () => {
 
     try {
       // Validate required fields
-      if (!tripData.title || !tripData.destination || !tripData.startDate || !tripData.endDate) {
+      if (!tripData.title || !tripData.destination || !tripData.startDate || !tripData.endDate || !tripData.budget || !tripData.travelers) {
         setError('Please fill in all required fields')
         setIsSubmitting(false)
         return
@@ -126,11 +126,11 @@ const CreateTrip = () => {
       // Call API to create trip
       const response = await tripApi.createTrip(apiData)
       
-      if (response.success) {
-        console.log('Trip created successfully:', response.data)
+      if (response.data.success) {
+        console.log('Trip created successfully:', response.data.data)
         navigate('/dashboard/my-trips')
       } else {
-        setError(response.message || 'Failed to create trip')
+        setError(response.data.message || 'Failed to create trip')
       }
     } catch (err) {
       console.error('Error creating trip:', err)
@@ -140,6 +140,8 @@ const CreateTrip = () => {
       if (err.errors && Array.isArray(err.errors)) {
         const validationErrors = err.errors.map(e => e.message).join(', ')
         setError(`Validation failed: ${validationErrors}`)
+      } else if (err.response?.data) {
+        setError(err.response.data.message || 'Failed to create trip. Please try again.')
       } else {
         setError(err.message || 'Failed to create trip. Please try again.')
       }
