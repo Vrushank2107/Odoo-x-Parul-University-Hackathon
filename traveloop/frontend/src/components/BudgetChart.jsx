@@ -13,7 +13,7 @@ import {
   Tooltip, 
   Legend
 } from 'recharts'
-import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react'
+import { TrendingUp, TrendingDown } from 'lucide-react'
 
 const BudgetChart = ({ 
   data, 
@@ -127,10 +127,10 @@ const BudgetChart = ({
           {total && (
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <DollarSign className="w-4 h-4 text-gray-400" />
+                <TrendingUp className="w-4 h-4 text-gray-400" />
                 <span className="text-sm text-gray-600">Total Budget</span>
               </div>
-              <span className="text-lg font-bold text-gray-900">${total}</span>
+              <span className="text-lg font-bold text-gray-900">₹{total}</span>
             </div>
           )}
         </div>

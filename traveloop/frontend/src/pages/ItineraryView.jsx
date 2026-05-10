@@ -1,154 +1,465 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Link, useParams } from 'react-router-dom'
+import { 
+  MapPin, 
+  Clock, 
+  Calendar,
+  ArrowRight,
+  Share2,
+  Download,
+  Edit,
+  Camera,
+  Utensils,
+  Hotel,
+  ShoppingBag,
+  Plane,
+  Star,
+  Heart,
+  Users,
+  Navigation,
+  CheckCircle
+} from 'lucide-react'
 
 const ItineraryView = () => {
+  const { tripId } = useParams()
+  const [selectedDay, setSelectedDay] = useState(1)
+  const [isLiked, setIsLiked] = useState(false)
+
   const itinerary = {
     title: 'Paris Adventure 2024',
     destination: 'Paris, France',
     dates: 'March 15-22, 2024',
+    image: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=1200&h=400&fit=crop',
+    rating: 4.8,
+    totalActivities: 16,
+    estimatedBudget: '$3,500',
+    travelers: 2,
     days: [
       {
+        id: 1,
         day: 1,
         date: 'March 15, 2024',
+        theme: 'Arrival & Exploration',
         activities: [
-          { time: '09:00', activity: 'Arrival at Charles de Gaulle Airport', location: 'CDG Airport' },
-          { time: '11:00', activity: 'Check-in at Hotel', location: 'Hotel Le Marais' },
-          { time: '13:00', activity: 'Lunch at local bistro', location: 'Café de Flore' },
-          { time: '15:00', activity: 'Visit Louvre Museum', location: 'Louvre Museum' },
-          { time: '19:00', activity: 'Dinner cruise on Seine', location: 'Seine River' }
+          { 
+            time: '09:00', 
+            activity: 'Arrival at Charles de Gaulle Airport', 
+            location: 'CDG Airport',
+            type: 'transport',
+            duration: '2 hours',
+            notes: 'Airport pickup and transfer to hotel'
+          },
+          { 
+            time: '11:00', 
+            activity: 'Check-in at Hotel Le Marais', 
+            location: 'Hotel Le Marais',
+            type: 'accommodation',
+            duration: '1 hour',
+            notes: 'Boutique hotel in historic district'
+          },
+          { 
+            time: '13:00', 
+            activity: 'Lunch at Café de Flore', 
+            location: 'Saint-Germain-des-Prés',
+            type: 'dining',
+            duration: '1.5 hours',
+            notes: 'Famous historic café with French cuisine'
+          },
+          { 
+            time: '15:00', 
+            activity: 'Visit Louvre Museum', 
+            location: 'Louvre Museum',
+            type: 'sightseeing',
+            duration: '3 hours',
+            notes: 'See Mona Lisa and Venus de Milo'
+          },
+          { 
+            time: '19:00', 
+            activity: 'Dinner Cruise on Seine River', 
+            location: 'Seine River',
+            type: 'dining',
+            duration: '2 hours',
+            notes: 'Romantic dinner with illuminated city views'
+          }
         ]
       },
       {
+        id: 2,
         day: 2,
         date: 'March 16, 2024',
+        theme: 'Iconic Paris',
         activities: [
-          { time: '08:00', activity: 'Breakfast at hotel', location: 'Hotel Le Marais' },
-          { time: '09:30', activity: 'Eiffel Tower visit', location: 'Eiffel Tower' },
-          { time: '12:00', activity: 'Lunch at Champ de Mars', location: 'Champ de Mars' },
-          { time: '14:00', activity: 'Arc de Triomphe', location: 'Arc de Triomphe' },
-          { time: '16:00', activity: 'Shopping on Champs-Élysées', location: 'Champs-Élysées' },
-          { time: '19:30', activity: 'Dinner in Montmartre', location: 'Montmartre' }
+          { 
+            time: '08:00', 
+            activity: 'Breakfast at Hotel', 
+            location: 'Hotel Le Marais',
+            type: 'dining',
+            duration: '1 hour'
+          },
+          { 
+            time: '09:30', 
+            activity: 'Eiffel Tower Visit', 
+            location: 'Champ de Mars',
+            type: 'sightseeing',
+            duration: '2.5 hours',
+            notes: 'Skip-the-line tickets, summit access'
+          },
+          { 
+            time: '12:30', 
+            activity: 'Lunch at Champ de Mars', 
+            location: 'Eiffel Tower Area',
+            type: 'dining',
+            duration: '1 hour',
+            notes: 'Picnic style lunch with tower views'
+          },
+          { 
+            time: '14:00', 
+            activity: 'Arc de Triomphe & Champs-Élysées', 
+            location: 'Charles de Gaulle Square',
+            type: 'sightseeing',
+            duration: '2 hours',
+            notes: 'Climb to top for panoramic views'
+          },
+          { 
+            time: '16:30', 
+            activity: 'Shopping on Champs-Élysées', 
+            location: 'Champs-Élysées',
+            type: 'shopping',
+            duration: '2 hours',
+            notes: 'Luxury shopping and cafés'
+          },
+          { 
+            time: '19:30', 
+            activity: 'Dinner in Montmartre', 
+            location: 'Montmartre',
+            type: 'dining',
+            duration: '2 hours',
+            notes: 'Traditional French restaurant'
+          }
         ]
       },
       {
+        id: 3,
         day: 3,
         date: 'March 17, 2024',
+        theme: 'Royal Versailles',
         activities: [
-          { time: '09:00', activity: 'Versailles day trip', location: 'Palace of Versailles' },
-          { time: '10:00', activity: 'Palace tour', location: 'Palace of Versailles' },
-          { time: '13:00', activity: 'Lunch in Versailles', location: 'Versailles Gardens' },
-          { time: '15:00', activity: 'Explore gardens', location: 'Versailles Gardens' },
-          { time: '18:00', activity: 'Return to Paris', location: 'Paris' }
+          { 
+            time: '09:00', 
+            activity: 'Day Trip to Versailles', 
+            location: 'Palace of Versailles',
+            type: 'transport',
+            duration: '1 hour',
+            notes: 'Train ride through French countryside'
+          },
+          { 
+            time: '10:00', 
+            activity: 'Palace Tour', 
+            location: 'Palace of Versailles',
+            type: 'sightseeing',
+            duration: '3 hours',
+            notes: 'Hall of Mirrors, King\'s Apartments'
+          },
+          { 
+            time: '13:00', 
+            activity: 'Lunch in Versailles Gardens', 
+            location: 'Versailles Gardens',
+            type: 'dining',
+            duration: '1.5 hours',
+            notes: 'Outdoor café with garden views'
+          },
+          { 
+            time: '15:00', 
+            activity: 'Explore Gardens & Marie Antoinette\'s Estate', 
+            location: 'Versailles Gardens',
+            type: 'sightseeing',
+            duration: '2.5 hours',
+            notes: 'Grand Trianon and Petit Trianon'
+          },
+          { 
+            time: '18:00', 
+            activity: 'Return to Paris', 
+            location: 'Paris',
+            type: 'transport',
+            duration: '1 hour'
+          }
         ]
       }
     ]
   }
 
+  const getActivityIcon = (type) => {
+    switch (type) {
+      case 'sightseeing': return Camera
+      case 'dining': return Utensils
+      case 'accommodation': return Hotel
+      case 'shopping': return ShoppingBag
+      case 'transport': return Plane
+      default: return MapPin
+    }
+  }
+
+  const getActivityColor = (type) => {
+    switch (type) {
+      case 'sightseeing': return 'from-blue-500 to-cyan-500'
+      case 'dining': return 'from-orange-500 to-red-500'
+      case 'accommodation': return 'from-purple-500 to-pink-500'
+      case 'shopping': return 'from-green-500 to-emerald-500'
+      case 'transport': return 'from-indigo-500 to-blue-500'
+      default: return 'from-gray-500 to-gray-600'
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{itinerary.title}</h1>
-          <div className="flex items-center gap-6 text-gray-600 mb-6">
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>{itinerary.destination}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span>{itinerary.dates}</span>
-            </div>
-          </div>
-          
-          <div className="flex gap-4">
-            <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-              Edit Itinerary
-            </button>
-            <button className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-              Share
-            </button>
-            <button className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
-              Download PDF
-            </button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+      {/* Hero Section */}
+      <div className="relative h-96 overflow-hidden">
+        <img
+          src={itinerary.image}
+          alt={itinerary.destination}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+        
+        <div className="absolute bottom-0 left-0 right-0 p-8">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h1 className="text-5xl font-bold text-white mb-4">{itinerary.title}</h1>
+              <div className="flex flex-wrap items-center gap-6 text-white/90">
+                <div className="flex items-center">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  {itinerary.destination}
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="w-5 h-5 mr-2" />
+                  {itinerary.dates}
+                </div>
+                <div className="flex items-center">
+                  <Users className="w-5 h-5 mr-2" />
+                  {itinerary.travelers} travelers
+                </div>
+                <div className="flex items-center">
+                  <Star className="w-5 h-5 mr-1 text-yellow-400 fill-current" />
+                  {itinerary.rating}
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
+      </div>
 
-        <div className="space-y-6">
-          {itinerary.days.map((day) => (
-            <div key={day.day} className="bg-white rounded-lg shadow-lg p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900">Day {day.day}</h2>
-                <span className="text-gray-600">{day.date}</span>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Action Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="bg-white rounded-2xl shadow-lg p-6 mb-8"
+        >
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
+            <div className="flex gap-8">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Activities</p>
+                <p className="text-2xl font-bold text-gray-900">{itinerary.totalActivities}</p>
               </div>
-              
-              <div className="space-y-4">
-                {day.activities.map((activity, index) => (
-                  <div key={index} className="flex gap-6 p-4 bg-gray-50 rounded-lg">
-                    <div className="flex-shrink-0">
-                      <div className="w-20 text-center">
-                        <span className="text-sm font-medium text-blue-600">{activity.time}</span>
-                      </div>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h4 className="font-medium text-gray-900 text-lg">{activity.activity}</h4>
-                          <p className="text-gray-600 flex items-center gap-2 mt-1">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            {activity.location}
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          <button className="text-blue-500 hover:text-blue-700">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          <button className="text-red-500 hover:text-red-700">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Est. Budget</p>
+                <p className="text-2xl font-bold text-gray-900">{itinerary.estimatedBudget}</p>
               </div>
-              
-              <div className="mt-6 pt-6 border-t">
-                <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200">
-                  Add Activity
-                </button>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Duration</p>
+                <p className="text-2xl font-bold text-gray-900">{itinerary.days.length} Days</p>
               </div>
             </div>
+            
+            <div className="flex gap-3">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setIsLiked(!isLiked)}
+                className={`p-3 rounded-xl flex items-center transition-all ${
+                  isLiked ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 flex items-center"
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Share
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-4 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 flex items-center"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                PDF
+              </motion.button>
+              <Link
+                to={`/dashboard/itinerary-builder/${tripId}`}
+                className="px-4 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-xl font-semibold hover:shadow-lg flex items-center"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Day Selector */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex gap-4 mb-8 overflow-x-auto pb-2"
+        >
+          {itinerary.days.map((day, index) => (
+            <motion.button
+              key={day.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSelectedDay(day.id)}
+              className={`flex-shrink-0 px-6 py-3 rounded-xl font-semibold transition-all ${
+                selectedDay === day.id
+                  ? 'bg-gradient-to-r from-sky-blue to-cyan text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Day {day.day}
+            </motion.button>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Trip Summary</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h4 className="font-medium text-gray-700 mb-2">Duration</h4>
-              <p className="text-gray-600">7 days, 6 nights</p>
+        {/* Current Day Content */}
+        {itinerary.days.map((day) => (
+          selectedDay === day.id && (
+            <motion.div
+              key={day.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-8"
+            >
+              {/* Day Header */}
+              <div className="bg-gradient-to-r from-sky-blue to-cyan rounded-2xl p-8 text-white">
+                <h2 className="text-3xl font-bold mb-2">Day {day.day}</h2>
+                <p className="text-xl text-white/90 mb-1">{day.date}</p>
+                <p className="text-lg text-white/80">{day.theme}</p>
+              </div>
+
+              {/* Timeline */}
+              <div className="relative">
+                {/* Timeline Line */}
+                <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-sky-blue to-cyan" />
+
+                {day.activities.map((activity, index) => {
+                  const Icon = getActivityIcon(activity.type)
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                      className="relative flex gap-6 mb-8"
+                    >
+                      {/* Timeline Dot */}
+                      <div className="relative z-10">
+                        <div className={`w-16 h-16 bg-gradient-to-r ${getActivityColor(activity.type)} rounded-2xl flex items-center justify-center shadow-lg`}>
+                          <Icon className="w-8 h-8 text-white" />
+                        </div>
+                      </div>
+
+                      {/* Activity Card */}
+                      <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        className="flex-1 bg-white rounded-2xl shadow-lg p-6 card-hover"
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className="text-lg font-bold text-sky-blue">{activity.time}</span>
+                              {activity.duration && (
+                                <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-lg">
+                                  {activity.duration}
+                                </span>
+                              )}
+                            </div>
+                            <h3 className="text-2xl font-bold text-gray-900 mb-2">{activity.activity}</h3>
+                            <div className="flex items-center text-gray-600 mb-3">
+                              <MapPin className="w-4 h-4 mr-2" />
+                              <span className="font-medium">{activity.location}</span>
+                            </div>
+                            {activity.notes && (
+                              <p className="text-gray-600 bg-gray-50 p-3 rounded-xl">{activity.notes}</p>
+                            )}
+                          </div>
+                          
+                          <div className="flex gap-2">
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              className="p-2 text-sky-blue hover:bg-sky-blue/10 rounded-xl"
+                            >
+                              <Navigation className="w-5 h-5" />
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              className="p-2 text-gray-600 hover:bg-gray-100 rounded-xl"
+                            >
+                              <CheckCircle className="w-5 h-5" />
+                            </motion.button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            </motion.div>
+          )
+        ))}
+
+        {/* Trip Summary */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+          className="mt-12 bg-white rounded-2xl shadow-lg p-8"
+        >
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">Trip Summary</h3>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl">
+              <Calendar className="w-8 h-8 text-sky-blue mx-auto mb-3" />
+              <p className="text-3xl font-bold text-gray-900 mb-1">{itinerary.days.length}</p>
+              <p className="text-gray-600">Days</p>
             </div>
-            <div>
-              <h4 className="font-medium text-gray-700 mb-2">Total Activities</h4>
-              <p className="text-gray-600">{itinerary.days.reduce((total, day) => total + day.activities.length, 0)} activities</p>
+            <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl">
+              <Camera className="w-8 h-8 text-green-600 mx-auto mb-3" />
+              <p className="text-3xl font-bold text-gray-900 mb-1">{itinerary.totalActivities}</p>
+              <p className="text-gray-600">Activities</p>
             </div>
-            <div>
-              <h4 className="font-medium text-gray-700 mb-2">Budget</h4>
-              <p className="text-gray-600">$3,500 estimated</p>
+            <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl">
+              <Users className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+              <p className="text-3xl font-bold text-gray-900 mb-1">{itinerary.travelers}</p>
+              <p className="text-gray-600">Travelers</p>
+            </div>
+            <div className="text-center p-6 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl">
+              <TrendingUp className="w-8 h-8 text-yellow-600 mx-auto mb-3" />
+              <p className="text-3xl font-bold text-gray-900 mb-1">{itinerary.estimatedBudget}</p>
+              <p className="text-gray-600">Est. Budget</p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   )
