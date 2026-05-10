@@ -18,7 +18,7 @@ services:
       - key: PORT
         value: "5000"
       - key: FRONTEND_URL
-        sync: false
+        value: https://traveloop-tau.vercel.app
       - key: DATABASE_URL
         fromDatabase:
           name: traveloop-db

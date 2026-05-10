@@ -88,7 +88,7 @@ backend/
    # Server Configuration
    PORT=5000
    NODE_ENV=development
-   FRONTEND_URL=http://localhost:5173
+   FRONTEND_URL=https://traveloop-tau.vercel.app
    ```
 
 ### Database Setup
@@ -289,7 +289,7 @@ DATABASE_URL="postgresql://username:password@hostname:5432/database_name?sslmode
 JWT_SECRET="your-production-jwt-secret"
 JWT_REFRESH_SECRET="your-production-refresh-secret"
 NODE_ENV="production"
-FRONTEND_URL="https://your-frontend-url.com"
+FRONTEND_URL="https://traveloop-tau.vercel.app"
 PORT=5000
 ```
 
