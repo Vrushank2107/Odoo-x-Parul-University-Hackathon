@@ -97,6 +97,54 @@ npm run dev
 - `npm run preview` - Preview the production build
 - `npm run lint` - Run ESLint to check for code issues
 
+## 🚀 Deployment
+
+### Vercel Deployment (Recommended for Frontend)
+
+The frontend is optimized for deployment on Vercel:
+
+1. **Install Vercel CLI** (optional):
+   ```bash
+   npm install -g vercel
+   ```
+
+2. **Deploy from CLI**:
+   ```bash
+   cd traveloop/frontend
+   vercel
+   ```
+
+3. **Deploy from Vercel Dashboard**:
+   - Push your code to GitHub
+   - Import the project in Vercel dashboard
+   - Set root directory to `traveloop/frontend`
+   - Configure environment variables:
+     - `VITE_API_URL`: Your backend API URL (e.g., `https://your-backend.onrender.com/api`)
+     - `VITE_NODE_ENV`: `production`
+   - Click Deploy
+
+4. **Environment Variables**:
+   - In Vercel dashboard, go to Settings > Environment Variables
+   - Add `VITE_API_URL` with your backend URL
+   - Add `VITE_NODE_ENV` set to `production`
+
+### Manual Deployment
+
+1. Build the project:
+   ```bash
+   npm run build
+   ```
+
+2. Deploy the `dist` folder to any static hosting service (Netlify, GitHub Pages, etc.)
+
+### Backend Deployment
+
+The backend should be deployed separately on a platform that supports Node.js and PostgreSQL:
+- **Render**: Already configured with `render.yaml`
+- **Railway**: Already configured with `railway.json`
+
+See the [backend README](../backend/README.md) for detailed backend deployment instructions.
+
 ## 🎨 Design System
 
 The application uses Tailwind CSS for styling with a modern, clean design aesthetic:

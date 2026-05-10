@@ -1,0 +1,23 @@
+# Dependencies
+node_modules
+
+# Environment files
+.env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+*.log
+*.lock
+dist
