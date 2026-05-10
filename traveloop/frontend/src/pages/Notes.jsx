@@ -72,9 +72,10 @@ const Notes = () => {
           <h1 className="text-3xl font-bold text-gray-900">Travel Notes</h1>
           <button
             onClick={() => setIsCreating(true)}
-            className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
+            className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 flex items-center"
           >
             Add New Note
+            <ArrowRight className="w-4 h-4 ml-2" />
           </button>
         </div>
 
@@ -122,18 +123,20 @@ const Notes = () => {
               <div className="flex gap-4">
                 <button
                   onClick={createNote}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center"
                 >
                   Save Note
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
                 <button
                   onClick={() => {
                     setIsCreating(false)
                     setNewNote({ title: '', content: '', category: 'General', trip: 'General' })
                   }}
-                  className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                  className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 flex items-center justify-center"
                 >
                   Cancel
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
               </div>
             </div>
@@ -187,9 +190,10 @@ const Notes = () => {
             <p className="text-gray-500 mb-4">Start by creating your first travel note</p>
             <button
               onClick={() => setIsCreating(true)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
             >
               Create Note
+              <ArrowRight className="w-4 h-4 ml-2" />
             </button>
           </div>
         )}

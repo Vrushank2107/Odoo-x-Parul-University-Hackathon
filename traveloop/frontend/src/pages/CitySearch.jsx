@@ -44,9 +44,10 @@ const CitySearch = () => {
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center"
               >
                 Search
+                <ArrowRight className="w-4 h-4 ml-2" />
               </button>
             </div>
           </div>
@@ -91,14 +92,16 @@ const CitySearch = () => {
               <p className="text-lg text-gray-600 mb-2">{selectedCity.country}</p>
               <p className="text-gray-700 mb-6">{selectedCity.description}</p>
               <div className="flex gap-4">
-                <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center">
                   View Details
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
                 <button 
                   onClick={() => setSelectedCity(null)}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 flex items-center justify-center"
                 >
                   Close
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
               </div>
             </div>

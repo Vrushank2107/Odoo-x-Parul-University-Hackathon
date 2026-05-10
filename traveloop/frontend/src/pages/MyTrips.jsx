@@ -91,8 +91,9 @@ const MyTrips = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">My Trips</h1>
-          <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700">
+          <button className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 flex items-center">
             Create New Trip
+            <ArrowRight className="w-4 h-4 ml-2" />
           </button>
         </div>
 
@@ -101,7 +102,7 @@ const MyTrips = () => {
             <div className="flex gap-2">
               <button
                 onClick={() => setFilter('all')}
-                className={`px-4 py-2 rounded-lg font-medium ${
+                className={`px-4 py-2 rounded-lg font-medium flex items-center ${
                   filter === 'all' 
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -111,7 +112,7 @@ const MyTrips = () => {
               </button>
               <button
                 onClick={() => setFilter('upcoming')}
-                className={`px-4 py-2 rounded-lg font-medium ${
+                className={`px-4 py-2 rounded-lg font-medium flex items-center ${
                   filter === 'upcoming' 
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -121,7 +122,7 @@ const MyTrips = () => {
               </button>
               <button
                 onClick={() => setFilter('completed')}
-                className={`px-4 py-2 rounded-lg font-medium ${
+                className={`px-4 py-2 rounded-lg font-medium flex items-center ${
                   filter === 'completed' 
                     ? 'bg-blue-600 text-white' 
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -192,11 +193,13 @@ const MyTrips = () => {
                 </div>
                 
                 <div className="flex gap-2">
-                  <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+                  <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm flex items-center justify-center">
                     View Details
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </button>
-                  <button className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm">
+                  <button className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm flex items-center justify-center">
                     Edit
+                    <ArrowRight className="w-4 h-4 ml-2" />
                   </button>
                 </div>
               </div>
@@ -218,9 +221,10 @@ const MyTrips = () => {
             {filter !== 'all' && (
               <button
                 onClick={() => setFilter('all')}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
               >
                 View All Trips
+                <ArrowRight className="w-4 h-4 ml-2" />
               </button>
             )}
           </div>
