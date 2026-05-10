@@ -31,85 +31,85 @@ const Budget = () => {
   })
 
   const trips = [
-    { id: 'paris', name: 'Paris Adventure', total: 5000 },
-    { id: 'tokyo', name: 'Tokyo Explorer', total: 7000 },
-    { id: 'bali', name: 'Bali Retreat', total: 3000 }
+    { id: 'paris', name: 'Paris Adventure', total: 415000 },
+    { id: 'tokyo', name: 'Tokyo Explorer', total: 581000 },
+    { id: 'bali', name: 'Bali Retreat', total: 249000 }
   ]
 
   const budgetData = {
     paris: {
-      total: 5000,
-      spent: 3247,
+      total: 415000,
+      spent: 270000,
       categories: [
         { 
           name: 'Transportation', 
-          budget: 1500, 
-          spent: 1245, 
+          budget: 124500, 
+          spent: 103335, 
           icon: Plane,
           color: 'from-blue-500 to-cyan-500',
           expenses: [
-            { date: '2024-03-15', description: 'Flight to Paris', amount: 850 },
-            { date: '2024-03-16', description: 'Metro Pass', amount: 75 },
-            { date: '2024-03-17', description: 'Taxi to Versailles', amount: 120 },
-            { date: '2024-03-18', description: 'Airport Transfer', amount: 200 }
+            { date: '2024-03-15', description: 'Flight to Paris', amount: 70550 },
+            { date: '2024-03-16', description: 'Metro Pass', amount: 6225 },
+            { date: '2024-03-17', description: 'Taxi to Versailles', amount: 9960 },
+            { date: '2024-03-18', description: 'Airport Transfer', amount: 16600 }
           ]
         },
         { 
           name: 'Accommodation', 
-          budget: 2000, 
-          spent: 1200, 
+          budget: 166000, 
+          spent: 99600, 
           icon: Hotel,
           color: 'from-purple-500 to-pink-500',
           expenses: [
-            { date: '2024-03-15', description: 'Hotel Le Marais', amount: 800 },
-            { date: '2024-03-17', description: 'Versailles Hotel', amount: 400 }
+            { date: '2024-03-15', description: 'Hotel Le Marais', amount: 66400 },
+            { date: '2024-03-17', description: 'Versailles Hotel', amount: 33200 }
           ]
         },
         { 
           name: 'Food & Dining', 
-          budget: 1000, 
-          spent: 567, 
+          budget: 83000, 
+          spent: 47061, 
           icon: Utensils,
           color: 'from-orange-500 to-red-500',
           expenses: [
-            { date: '2024-03-15', description: 'Café de Flore', amount: 85 },
-            { date: '2024-03-16', description: 'Eiffel Tower Restaurant', amount: 120 },
-            { date: '2024-03-17', description: 'Local Bistro', amount: 65 },
-            { date: '2024-03-18', description: 'Dinner Cruise', amount: 145 },
-            { date: '2024-03-19', description: 'Montmartre Dining', amount: 152 }
+            { date: '2024-03-15', description: 'Café de Flore', amount: 7055 },
+            { date: '2024-03-16', description: 'Eiffel Tower Restaurant', amount: 9960 },
+            { date: '2024-03-17', description: 'Local Bistro', amount: 5395 },
+            { date: '2024-03-18', description: 'Dinner Cruise', amount: 12035 },
+            { date: '2024-03-19', description: 'Montmartre Dining', amount: 12616 }
           ]
         },
         { 
           name: 'Activities', 
-          budget: 500, 
-          spent: 235, 
+          budget: 41500, 
+          spent: 19505, 
           icon: Camera,
           color: 'from-green-500 to-emerald-500',
           expenses: [
-            { date: '2024-03-16', description: 'Louvre Museum', amount: 95 },
-            { date: '2024-03-17', description: 'Versailles Palace', amount: 140 }
+            { date: '2024-03-16', description: 'Louvre Museum', amount: 7885 },
+            { date: '2024-03-17', description: 'Versailles Palace', amount: 11620 }
           ]
         }
       ]
     },
     tokyo: {
-      total: 7000,
-      spent: 4250,
+      total: 581000,
+      spent: 352750,
       categories: [
-        { name: 'Transportation', budget: 2000, spent: 1800, icon: Plane, color: 'from-blue-500 to-cyan-500' },
-        { name: 'Accommodation', budget: 2500, spent: 1500, icon: Hotel, color: 'from-purple-500 to-pink-500' },
-        { name: 'Food & Dining', budget: 1500, spent: 650, icon: Utensils, color: 'from-orange-500 to-red-500' },
-        { name: 'Activities', budget: 1000, spent: 300, icon: Camera, color: 'from-green-500 to-emerald-500' }
+        { name: 'Transportation', budget: 166000, spent: 149400, icon: Plane, color: 'from-blue-500 to-cyan-500' },
+        { name: 'Accommodation', budget: 207500, spent: 124500, icon: Hotel, color: 'from-purple-500 to-pink-500' },
+        { name: 'Food & Dining', budget: 124500, spent: 53950, icon: Utensils, color: 'from-orange-500 to-red-500' },
+        { name: 'Activities', budget: 83000, spent: 24900, icon: Camera, color: 'from-green-500 to-emerald-500' }
       ]
     },
     bali: {
-      total: 3000,
-      spent: 1850,
+      total: 249000,
+      spent: 153550,
       categories: [
-        { name: 'Transportation', budget: 800, spent: 750, icon: Plane, color: 'from-blue-500 to-cyan-500' },
-        { name: 'Accommodation', budget: 1200, spent: 600, icon: Hotel, color: 'from-purple-500 to-pink-500' },
-        { name: 'Food & Dining', budget: 600, spent: 350, icon: Utensils, color: 'from-orange-500 to-red-500' },
-        { name: 'Activities', budget: 400, spent: 150, icon: Camera, color: 'from-green-500 to-emerald-500' }
+        { name: 'Transportation', budget: 66400, spent: 62250, icon: Plane, color: 'from-blue-500 to-cyan-500' },
+        { name: 'Accommodation', budget: 99600, spent: 49800, icon: Hotel, color: 'from-purple-500 to-pink-500' },
+        { name: 'Food & Dining', budget: 49800, spent: 29050, icon: Utensils, color: 'from-orange-500 to-red-500' },
+        { name: 'Activities', budget: 33200, spent: 12450, icon: Camera, color: 'from-green-500 to-emerald-500' }
       ]
     }
   }
@@ -205,7 +205,7 @@ const Budget = () => {
                 Spent
               </span>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-2">${currentBudget.spent}</p>
+            <p className="text-3xl font-bold text-gray-900 mb-2">₹{currentBudget.spent}</p>
             <div className="flex items-center text-sm text-gray-600">
               <ArrowUp className="w-4 h-4 mr-1 text-red-500" />
               +12% from last week
@@ -225,7 +225,7 @@ const Budget = () => {
               </span>
             </div>
             <p className={`text-3xl font-bold mb-2 ${remaining >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              ${remaining}
+              ₹{remaining}
             </p>
             <div className="flex items-center text-sm text-gray-600">
               <ArrowDown className="w-4 h-4 mr-1 text-green-500" />
@@ -280,14 +280,14 @@ const Budget = () => {
                     </div>
                     <div>
                       <h3 className="text-xl font-bold text-gray-900">{category.name}</h3>
-                      <p className="text-sm text-gray-600">${category.spent} of ${category.budget}</p>
+                      <p className="text-sm text-gray-600">₹{category.spent} of ₹{category.budget}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     <p className={`text-lg font-bold ${
                       categoryRemaining >= 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
-                      ${categoryRemaining}
+                      ₹{categoryRemaining}
                     </p>
                     <p className="text-sm text-gray-600">remaining</p>
                   </div>
@@ -392,7 +392,7 @@ const Budget = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-gray-900">${expense.amount}</span>
+                    <span className="text-lg font-bold text-gray-900">₹{expense.amount}</span>
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
@@ -440,7 +440,7 @@ const Budget = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Amount ($)</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Amount (₹)</label>
                   <input
                     type="number"
                     value={newExpense.amount}

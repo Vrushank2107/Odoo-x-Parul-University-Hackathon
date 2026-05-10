@@ -18,10 +18,13 @@ import {
   Utensils,
   TrendingUp
 } from 'lucide-react'
+import { tripApi } from '../api/tripApi.js'
 
 const CreateTrip = () => {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const [tripData, setTripData] = useState({
     title: '',
     destination: '',
@@ -35,6 +38,9 @@ const CreateTrip = () => {
     transportation: 'flight',
     activities: []
   })
+
+  // Set minimum date to today for date inputs
+  const today = new Date().toISOString().split('T')[0]
 
   const tripTypes = [
     { id: 'leisure', name: 'Leisure', icon: Heart, color: 'from-pink-500 to-rose-500' },
@@ -90,11 +96,56 @@ const CreateTrip = () => {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    console.log('Creating trip:', tripData)
-    // Handle trip creation logic here
-    navigate('/dashboard/my-trips')
+    setIsSubmitting(true)
+    setError('')
+
+    try {
+      // Validate required fields
+      if (!tripData.title || !tripData.destination || !tripData.startDate || !tripData.endDate) {
+        setError('Please fill in all required fields')
+        setIsSubmitting(false)
+        return
+      }
+
+      // Prepare data for API
+      const apiData = {
+        title: tripData.title,
+        destination: tripData.destination,
+        description: tripData.description,
+        startDate: tripData.startDate,
+        endDate: tripData.endDate,
+        budget: parseFloat(tripData.budget) || 0,
+        tripType: tripData.tripType.toUpperCase(),
+        travelers: parseInt(tripData.travelers) || 1
+      }
+
+      console.log('Creating trip:', apiData)
+      
+      // Call API to create trip
+      const response = await tripApi.createTrip(apiData)
+      
+      if (response.success) {
+        console.log('Trip created successfully:', response.data)
+        navigate('/dashboard/my-trips')
+      } else {
+        setError(response.message || 'Failed to create trip')
+      }
+    } catch (err) {
+      console.error('Error creating trip:', err)
+      console.error('Error details:', JSON.stringify(err, null, 2))
+      
+      // Handle validation errors specifically
+      if (err.errors && Array.isArray(err.errors)) {
+        const validationErrors = err.errors.map(e => e.message).join(', ')
+        setError(`Validation failed: ${validationErrors}`)
+      } else {
+        setError(err.message || 'Failed to create trip. Please try again.')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const nextStep = () => {
@@ -162,6 +213,17 @@ const CreateTrip = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="bg-white rounded-2xl shadow-xl p-8"
         >
+          {/* Error Display */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl"
+            >
+              <p className="text-red-600 text-sm">{error}</p>
+            </motion.div>
+          )}
+          
           <form onSubmit={handleSubmit}>
             {/* Step 1: Basic Information */}
             {currentStep === 1 && (
@@ -220,6 +282,7 @@ const CreateTrip = () => {
                         name="startDate"
                         value={tripData.startDate}
                         onChange={handleChange}
+                        min={today}
                         required
                         className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-blue focus:border-sky-blue transition-all"
                       />
@@ -238,6 +301,7 @@ const CreateTrip = () => {
                         name="endDate"
                         value={tripData.endDate}
                         onChange={handleChange}
+                        min={tripData.startDate || today}
                         required
                         className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-sky-blue focus:border-sky-blue transition-all"
                       />
@@ -488,10 +552,24 @@ const CreateTrip = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="submit"
-                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold flex items-center hover:shadow-lg transition-all"
+                  disabled={isSubmitting}
+                  className={`px-6 py-3 rounded-xl font-semibold flex items-center transition-all ${
+                    isSubmitting
+                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:shadow-lg'
+                  }`}
                 >
-                  Create Trip
-                  <Plane className="w-4 h-4 ml-2" />
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                      Creating Trip...
+                    </>
+                  ) : (
+                    <>
+                      Create Trip
+                      <Plane className="w-4 h-4 ml-2" />
+                    </>
+                  )}
                 </motion.button>
               )}
             </div>

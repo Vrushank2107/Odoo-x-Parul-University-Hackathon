@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { 
@@ -19,99 +19,155 @@ import {
   TrendingUp,
   CheckCircle
 } from 'lucide-react'
+import { tripApi } from '../api/tripApi'
 
 const MyTrips = () => {
-  const [trips, setTrips] = useState([
+  const [trips, setTrips] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [likedTrips, setLikedTrips] = useState(new Set())
+
+  const fallbackTrips = [
     {
       id: 1,
       title: 'Paris Adventure 2024',
       destination: 'Paris, France',
+      description: 'Experience the magic of Paris with our carefully curated 7-day adventure. From the Eiffel Tower to the Louvre, from charming cafés to world-class museums.',
+      coverImage: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&h=500&fit=crop',
+      status: 'PLANNED',
       dates: 'March 15-22, 2024',
-      status: 'upcoming',
-      image: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=250&fit=crop',
-      budget: 290500,
-      spent: 99600,
-      description: 'Romantic getaway to City of Light with visits to Eiffel Tower, Louvre, and charming cafés.',
-      rating: 4.8,
-      daysLeft: 45,
-      travelers: 2
+      startDate: '2024-03-15',
+      endDate: '2024-03-22',
+      budget: 200000,
+      spent: 85000,
+      travelers: 2,
+      rating: 4.9,
+      daysUntil: 30,
+      tripType: 'cultural'
     },
     {
       id: 2,
-      title: 'Tokyo Explorer',
-      destination: 'Tokyo, Japan',
-      dates: 'February 10-18, 2024',
-      status: 'completed',
-      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=250&fit=crop',
-      budget: 348600,
-      spent: 340300,
-      description: 'Amazing cultural experience exploring temples, modern districts, and incredible cuisine.',
-      rating: 4.9,
-      daysLeft: 0,
-      travelers: 3
+      title: 'Bali Beach Getaway',
+      destination: 'Bali, Indonesia',
+      description: 'Tropical paradise escape with stunning beaches, ancient temples, and vibrant local culture. Perfect for relaxation and adventure.',
+      coverImage: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&h=500&fit=crop',
+      status: 'COMPLETED',
+      dates: 'January 5-12, 2024',
+      startDate: '2024-01-05',
+      endDate: '2024-01-12',
+      budget: 150000,
+      spent: 142000,
+      travelers: 4,
+      rating: 4.8,
+      daysUntil: 0,
+      tripType: 'beach'
     },
     {
       id: 3,
-      title: 'NYC Weekend',
-      destination: 'New York, USA',
-      dates: 'January 5-7, 2024',
-      status: 'completed',
-      image: 'https://images.unsplash.com/photo-1496442226665-8d4d0e62e6e9?w=400&h=250&fit=crop',
-      budget: 124500,
-      spent: 120350,
-      description: 'Quick weekend trip to see Broadway shows and explore Central Park.',
-      rating: 4.6,
-      daysLeft: 0,
-      travelers: 2
+      title: 'Tokyo Technology Tour',
+      destination: 'Tokyo, Japan',
+      description: 'Explore the cutting-edge technology and ancient traditions of Tokyo. From neon-lit streets to serene temples, experience the perfect blend.',
+      coverImage: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&h=500&fit=crop',
+      status: 'PLANNED',
+      dates: 'May 10-18, 2024',
+      startDate: '2024-05-10',
+      endDate: '2024-05-18',
+      budget: 250000,
+      spent: 60000,
+      travelers: 2,
+      rating: 4.7,
+      daysUntil: 85,
+      tripType: 'cultural'
     },
     {
       id: 4,
-      title: 'Summer in Greece',
-      destination: 'Santorini, Greece',
-      dates: 'June 20-30, 2024',
-      status: 'upcoming',
-      image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=400&h=250&fit=crop',
-      budget: 415000,
-      spent: 66400,
-      description: 'Island hopping through beautiful Greek islands with stunning sunsets and beaches.',
-      rating: 4.7,
-      daysLeft: 75,
-      travelers: 4
+      title: 'New York City Explorer',
+      destination: 'New York, USA',
+      description: 'The ultimate NYC experience - Times Square, Central Park, Broadway shows, and iconic landmarks. The city that never sleeps awaits.',
+      coverImage: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&h=500&fit=crop',
+      status: 'PLANNED',
+      dates: 'June 20-27, 2024',
+      startDate: '2024-06-20',
+      endDate: '2024-06-27',
+      budget: 300000,
+      spent: 45000,
+      travelers: 3,
+      rating: 4.6,
+      daysUntil: 126,
+      tripType: 'adventure'
     },
     {
       id: 5,
-      title: 'London Business Trip',
-      destination: 'London, UK',
-      dates: 'May 10-15, 2024',
-      status: 'upcoming',
-      image: 'https://images.unsplash.com/photo-1513635263979-8845079d7d5b?w=400&h=250&fit=crop',
-      budget: 249000,
-      spent: 0,
-      description: 'Business trip with some leisure time to explore historic landmarks.',
-      rating: 4.5,
-      daysLeft: 30,
-      travelers: 1
+      title: 'Dubai Luxury Experience',
+      destination: 'Dubai, UAE',
+      description: 'Experience the ultimate luxury in Dubai - Burj Khalifa, desert safaris, world-class shopping, and fine dining.',
+      coverImage: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&h=500&fit=crop',
+      status: 'COMPLETED',
+      dates: 'December 15-22, 2023',
+      startDate: '2023-12-15',
+      endDate: '2023-12-22',
+      budget: 400000,
+      spent: 380000,
+      travelers: 2,
+      rating: 4.9,
+      daysUntil: 0,
+      tripType: 'luxury'
     }
-  ])
+  ]
 
-  const [filter, setFilter] = useState('all')
-  const [searchQuery, setSearchQuery] = useState('')
+  useEffect(() => {
+    fetchTrips()
+  }, [])
 
-  const filteredTrips = trips.filter(trip => {
-    const matchesFilter = filter === 'all' || trip.status === filter
-    const matchesSearch = trip.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         trip.destination.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesFilter && matchesSearch
-  })
+  const fetchTrips = async () => {
+    try {
+      setLoading(true)
+      const response = await tripApi.getTrips()
+      setTrips(response.data && response.data.length > 0 ? response.data : fallbackTrips)
+    } catch (error) {
+      console.error('Failed to fetch trips:', error)
+      setTrips(fallbackTrips)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const filteredFetch = async () => {
+      try {
+        setLoading(true)
+        const params = {
+          ...(filter !== 'all' && { status: filter === 'upcoming' ? 'PLANNED' : filter.toUpperCase() }),
+          ...(searchQuery && { search: searchQuery })
+        }
+        const response = await tripApi.getTrips(params)
+        setTrips(response.data && response.data.length > 0 ? response.data : fallbackTrips)
+      } catch (error) {
+        console.error('Failed to fetch filtered trips:', error)
+        setTrips(fallbackTrips)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    const debounceTimer = setTimeout(filteredFetch, 300)
+    return () => clearTimeout(debounceTimer)
+  }, [filter, searchQuery])
+
+  // Remove local filtering since API handles it
+  const filteredTrips = trips
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'upcoming':
+      case 'PLANNED':
         return 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
-      case 'completed':
+      case 'COMPLETED':
         return 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
-      case 'cancelled':
+      case 'CANCELLED':
         return 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
+      case 'ACTIVE':
+        return 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
       default:
         return 'bg-gray-200 text-gray-800'
     }
@@ -122,6 +178,18 @@ const MyTrips = () => {
     if (percentage > 90) return 'bg-gradient-to-r from-red-500 to-pink-500'
     if (percentage > 70) return 'bg-gradient-to-r from-yellow-500 to-orange-500'
     return 'bg-gradient-to-r from-green-500 to-emerald-500'
+  }
+
+  const toggleLike = (tripId) => {
+    setLikedTrips(prev => {
+      const newLiked = new Set(prev)
+      if (newLiked.has(tripId)) {
+        newLiked.delete(tripId)
+      } else {
+        newLiked.add(tripId)
+      }
+      return newLiked
+    })
   }
 
   return (
@@ -159,7 +227,7 @@ const MyTrips = () => {
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
                 <Plane className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900">{trips.length}</span>
+              <span className="text-2xl font-bold text-gray-900">{Array.isArray(trips) ? trips.length : 0}</span>
             </div>
             <p className="text-gray-600 text-sm">Total Trips</p>
           </div>
@@ -169,7 +237,7 @@ const MyTrips = () => {
               <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
                 <Clock className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900">{trips.filter(t => t.status === 'upcoming').length}</span>
+              <span className="text-2xl font-bold text-gray-900">{Array.isArray(trips) ? trips.filter(t => t.status === 'PLANNED').length : 0}</span>
             </div>
             <p className="text-gray-600 text-sm">Upcoming</p>
           </div>
@@ -179,7 +247,7 @@ const MyTrips = () => {
               <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900">{trips.filter(t => t.status === 'completed').length}</span>
+              <span className="text-2xl font-bold text-gray-900">{Array.isArray(trips) ? trips.filter(t => t.status === 'COMPLETED').length : 0}</span>
             </div>
             <p className="text-gray-600 text-sm">Completed</p>
           </div>
@@ -189,7 +257,7 @@ const MyTrips = () => {
               <div className="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900">₹{trips.reduce((sum, t) => sum + t.budget, 0).toLocaleString('en-IN')}</span>
+              <span className="text-2xl font-bold text-gray-900">₹{Array.isArray(trips) ? trips.reduce((sum, t) => sum + (t.budget || 0), 0).toLocaleString('en-IN') : 0}</span>
             </div>
             <p className="text-gray-600 text-sm">Total Budget</p>
           </div>
@@ -260,7 +328,8 @@ const MyTrips = () => {
 
         {/* Trips Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredTrips.map((trip, index) => (
+          {Array.isArray(filteredTrips) && filteredTrips.length > 0 ? (
+            filteredTrips.map((trip, index) => (
             <motion.div
               key={trip.id}
               initial={{ opacity: 0, y: 20 }}
@@ -271,7 +340,7 @@ const MyTrips = () => {
             >
               <div className="relative h-52">
                 <img 
-                  src={trip.image} 
+                  src={trip.coverImage} 
                   alt={trip.destination}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
@@ -288,9 +357,10 @@ const MyTrips = () => {
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
+                  onClick={() => toggleLike(trip.id)}
                   className="absolute top-4 left-4 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center"
                 >
-                  <Heart className="w-5 h-5 text-white" />
+                  <Heart className={`w-5 h-5 ${likedTrips.has(trip.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
                 </motion.button>
 
                 {/* Trip Info Overlay */}
@@ -313,10 +383,10 @@ const MyTrips = () => {
                     <Users className="w-4 h-4 mr-1" />
                     {trip.travelers}
                   </div>
-                  {trip.status === 'upcoming' && (
+                  {trip.status === 'PLANNED' && (
                     <div className="flex items-center text-blue-600 text-sm font-medium">
                       <Clock className="w-4 h-4 mr-1" />
-                      {trip.daysLeft} days
+                      {trip.daysUntil} days
                     </div>
                   )}
                 </div>
@@ -361,44 +431,33 @@ const MyTrips = () => {
                 </div>
               </div>
             </motion.div>
-          ))}
-        </div>
-
-        {/* Empty State */}
-        {filteredTrips.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16"
-          >
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Plane className="w-12 h-12 text-gray-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">No trips found</h3>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              {filter === 'all' && !searchQuery 
-                ? 'Start by creating your first adventure' 
-                : `No trips found matching your criteria`}
-            </p>
-            {(filter !== 'all' || searchQuery) && (
-              <div className="flex gap-4 justify-center">
-                <button
-                  onClick={() => { setFilter('all'); setSearchQuery('') }}
-                  className="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-all flex items-center"
-                >
-                  Clear Filters
-                </button>
+            ))
+          ) : (
+            <div className="col-span-full">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center py-16"
+              >
+                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Plane className="w-12 h-12 text-gray-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">No trips found</h3>
+                <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                  {!Array.isArray(filteredTrips) ? 'Error loading trips' : 
+                   (filter === 'all' && !searchQuery ? 'Start by creating your first adventure' : 'No trips found matching your criteria')}
+                </p>
                 <Link
                   to="/dashboard/create-trip"
-                  className="px-6 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center"
+                  className="px-6 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-xl font-semibold hover:shadow-lg transition-all flex items-center mx-auto"
                 >
                   <Plus className="w-5 h-5 mr-2" />
                   Create Trip
                 </Link>
-              </div>
-            )}
-          </motion.div>
-        )}
+              </motion.div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

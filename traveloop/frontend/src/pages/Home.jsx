@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 import { 
   Plane, 
   MapPin, 
@@ -13,27 +14,42 @@ import {
   Search,
   Globe,
   Shield,
-  Zap
+  Zap,
+  TrendingUp,
+  Clock,
+  Map,
+  PlusCircle,
+  Package
 } from 'lucide-react'
 
 const Home = () => {
+  const { user } = useAuth()
   const [currentSlide, setCurrentSlide] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
+  const [likedDestinations, setLikedDestinations] = useState(new Set())
 
-  const heroSlides = [
+  const heroSlides = user ? [
+    {
+      id: 1,
+      title: `Welcome back, ${user.name}!`,
+      subtitle: "Continue planning your next adventure or explore new destinations",
+      image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop",
+      cta: "My Dashboard"
+    },
+    {
+      id: 3,
+      title: "Explore New Horizons",
+      subtitle: "Discover amazing destinations and plan your next unforgettable journey",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop",
+      cta: "Create Trip"
+    }
+  ] : [
     {
       id: 1,
       title: "Discover Your Next Adventure",
       subtitle: "Plan unforgettable journeys with AI-powered travel assistance",
       image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop",
       cta: "Start Planning"
-    },
-    {
-      id: 2,
-      title: "Travel Smart, Travel Better",
-      subtitle: "Real-time budget tracking and collaborative trip planning",
-      image: "https://images.unsplash.com/photo-1507525428034-b723a9ce6890?w=1200&h=800&fit=crop",
-      cta: "Explore Features"
     },
     {
       id: 3,
@@ -49,7 +65,7 @@ const Home = () => {
       id: 1,
       name: "Bali, Indonesia",
       description: "Tropical paradise with stunning beaches and vibrant culture",
-      image: "https://images.unsplash.com/photo-1537953764746-f6e532f4dbaf?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&h=300&fit=crop",
       price: "₹1,08,000",
       rating: 4.8,
       duration: "7 days"
@@ -58,7 +74,7 @@ const Home = () => {
       id: 2,
       name: "Paris, France",
       description: "City of lights with timeless romance and art",
-      image: "https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&h=300&fit=crop",
       price: "₹1,83,000",
       rating: 4.9,
       duration: "5 days"
@@ -67,7 +83,7 @@ const Home = () => {
       id: 3,
       name: "Tokyo, Japan",
       description: "Modern metropolis blending tradition with innovation",
-      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&h=300&fit=crop",
       price: "₹2,16,000",
       rating: 4.7,
       duration: "6 days"
@@ -76,7 +92,7 @@ const Home = () => {
       id: 4,
       name: "New York, USA",
       description: "The city that never sleeps with endless possibilities",
-      image: "https://images.unsplash.com/photo-1496442226666-8274e0d47c5a?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=300&fit=crop",
       price: "₹1,58,000",
       rating: 4.6,
       duration: "4 days"
@@ -117,6 +133,18 @@ const Home = () => {
     }, 5000)
     return () => clearInterval(timer)
   }, [])
+
+  const toggleLike = (destinationId) => {
+    setLikedDestinations(prev => {
+      const newLiked = new Set(prev)
+      if (newLiked.has(destinationId)) {
+        newLiked.delete(destinationId)
+      } else {
+        newLiked.add(destinationId)
+      }
+      return newLiked
+    })
+  }
 
   const features = [
     {
@@ -188,20 +216,41 @@ const Home = () => {
               </p>
               
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                <Link
-                  to="/signup"
-                  className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg inline-flex items-center"
-                >
-                  {heroSlides[currentSlide].cta}
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-                
-                <Link
-                  to="/login"
-                  className="px-8 py-4 text-white border-2 border-white/30 rounded-xl hover:bg-white/10 transition-all text-lg font-medium"
-                >
-                  Sign In
-                </Link>
+                {user ? (
+                  <>
+                    <Link
+                      to={currentSlide === 0 ? "/dashboard" : currentSlide === 1 ? "/dashboard/my-trips" : "/dashboard/create-trip"}
+                      className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg inline-flex items-center"
+                    >
+                      {heroSlides[currentSlide].cta}
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Link>
+                    
+                    <Link
+                      to="/full-app"
+                      className="px-8 py-4 text-white border-2 border-white/30 rounded-xl hover:bg-white/10 transition-all text-lg font-medium"
+                    >
+                      Explore All Features
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/signup"
+                      className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg inline-flex items-center"
+                    >
+                      {heroSlides[currentSlide].cta}
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Link>
+                    
+                    <Link
+                      to="/login"
+                      className="px-8 py-4 text-white border-2 border-white/30 rounded-xl hover:bg-white/10 transition-all text-lg font-medium"
+                    >
+                      Sign In
+                    </Link>
+                  </>
+                )}
               </div>
             </motion.div>
           </div>
@@ -222,6 +271,138 @@ const Home = () => {
           ))}
         </div>
       </section>
+
+      {/* Personalized Dashboard Section - Only for logged-in users */}
+      {user && (
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Your Travel Dashboard
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Quick access to your travel planning tools and recent activity
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="bg-white rounded-2xl p-6 shadow-lg card-hover"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                    <Calendar className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-500">Active</span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">3</h3>
+                <p className="text-gray-600">Upcoming Trips</p>
+                <Link to="/dashboard/my-trips" className="text-blue-600 hover:text-blue-700 font-medium mt-4 inline-block">
+                  View All →
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="bg-white rounded-2xl p-6 shadow-lg card-hover"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-500">Budget</span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">₹45,000</h3>
+                <p className="text-gray-600">Total Budget</p>
+                <Link to="/dashboard/budget/sample" className="text-green-600 hover:text-green-700 font-medium mt-4 inline-block">
+                  Manage →
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="bg-white rounded-2xl p-6 shadow-lg card-hover"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <MapPin className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-500">Places</span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">12</h3>
+                <p className="text-gray-600">Destinations</p>
+                <Link to="/dashboard/city-search" className="text-purple-600 hover:text-purple-700 font-medium mt-4 inline-block">
+                  Explore →
+                </Link>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="bg-white rounded-2xl p-6 shadow-lg card-hover"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                    <Users className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm text-gray-500">Shared</span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">5</h3>
+                <p className="text-gray-600">Travel Companions</p>
+                <Link to="/dashboard/notes/sample" className="text-orange-600 hover:text-orange-700 font-medium mt-4 inline-block">
+                  Collaborate →
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Quick Actions */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="bg-gradient-to-r from-sky-blue to-cyan rounded-2xl p-8 text-white"
+            >
+              <h3 className="text-2xl font-bold mb-6">Quick Actions</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Link
+                  to="/dashboard/create-trip"
+                  className="bg-white/20 backdrop-blur-sm rounded-xl p-4 hover:bg-white/30 transition-all text-center"
+                >
+                  <PlusCircle className="w-8 h-8 mx-auto mb-2" />
+                  <span className="font-medium">Create New Trip</span>
+                </Link>
+                <Link
+                  to="/dashboard/itinerary-builder/sample"
+                  className="bg-white/20 backdrop-blur-sm rounded-xl p-4 hover:bg-white/30 transition-all text-center"
+                >
+                  <Map className="w-8 h-8 mx-auto mb-2" />
+                  <span className="font-medium">Plan Itinerary</span>
+                </Link>
+                <Link
+                  to="/dashboard/packing/sample"
+                  className="bg-white/20 backdrop-blur-sm rounded-xl p-4 hover:bg-white/30 transition-all text-center"
+                >
+                  <Package className="w-8 h-8 mx-auto mb-2" />
+                  <span className="font-medium">Packing List</span>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="py-20 bg-white">
@@ -301,8 +482,15 @@ const Home = () => {
                 <div className="relative h-64 rounded-2xl overflow-hidden shadow-lg">
                   <img
                     src={destination.image}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      toggleLike(destination.id)
+                    }}
                     alt={destination.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                      e.target.src = "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop";
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                   
@@ -310,9 +498,13 @@ const Home = () => {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      toggleLike(destination.id)
+                    }}
                     className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center"
                   >
-                    <Heart className="w-5 h-5 text-white" />
+                    <Heart className={`w-5 h-5 ${likedDestinations.has(destination.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
                   </motion.button>
                   
                   {/* Content */}
@@ -351,11 +543,11 @@ const Home = () => {
 
           <div className="text-center mt-12">
             <Link
-              to="/city-search"
-              className="bg-sky-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-blue/90 transition-all flex items-center"
+              to="/dashboard/city-search"
+              className="bg-sky-blue text-white px-8 py-4 rounded-xl font-semibold hover:bg-sky-blue/90 transition-all inline-flex items-center shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               View All Destinations
-              <ArrowRight className="w-4 h-4 ml-2" />
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
           </div>
         </div>
@@ -422,30 +614,61 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-4xl font-bold text-white mb-6">
-              Ready to Start Your Journey?
-            </h2>
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Join thousands of travelers who are already planning amazing trips with Traveloop
-            </p>
-            
-            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link
-                to="/signup"
-                className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg inline-flex items-center"
-              >
-                Get Started Free
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-              
-              <Link
-                to="/dashboard/create-trip"
-                className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all text-lg inline-flex items-center"
-              >
-                Plan a Trip
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-            </div>
+            {user ? (
+              <>
+                <h2 className="text-4xl font-bold text-white mb-6">
+                  Ready for Your Next Adventure?
+                </h2>
+                <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                  Continue your travel journey with personalized planning and amazing features
+                </p>
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                  <Link
+                    to="/dashboard/create-trip"
+                    className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg inline-flex items-center"
+                  >
+                    Create New Trip
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
+                  
+                  <Link
+                    to="/dashboard/my-trips"
+                    className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all text-lg inline-flex items-center"
+                  >
+                    My Trips
+                    <Calendar className="w-5 h-5 ml-2" />
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <h2 className="text-4xl font-bold text-white mb-6">
+                  Ready to Start Your Journey?
+                </h2>
+                <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                  Join thousands of travelers who are already planning amazing trips with Traveloop
+                </p>
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                  <Link
+                    to="/signup"
+                    className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg inline-flex items-center"
+                  >
+                    Get Started Free
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
+                  
+                  <Link
+                    to="/dashboard/create-trip"
+                    className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all text-lg inline-flex items-center"
+                  >
+                    Plan a Trip
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
+                </div>
+              </>
+            )}
           </motion.div>
         </div>
       </section>

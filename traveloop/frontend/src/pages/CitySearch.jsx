@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { searchApi } from '../api/searchApi'
 import { 
   Search, 
   MapPin, 
@@ -28,6 +29,161 @@ const CitySearch = () => {
   const [selectedType, setSelectedType] = useState('all')
   const [priceRange, setPriceRange] = useState('all')
   const [showFilters, setShowFilters] = useState(false)
+  const [cities, setCities] = useState([])
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
+  const [likedCities, setLikedCities] = useState(new Set())
+
+  const fallbackCities = [
+    {
+      id: 1,
+      name: 'Paris',
+      country: 'France',
+      description: 'The City of Lights, known for the Eiffel Tower, Louvre Museum, and romantic ambiance',
+      imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&h=300&fit=crop',
+      rating: 4.9,
+      price: '₹1,83,000',
+      region: 'europe',
+      type: 'romantic'
+    },
+    {
+      id: 2,
+      name: 'Bali',
+      country: 'Indonesia',
+      description: 'Tropical paradise with stunning beaches, temples, and vibrant culture',
+      imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=400&h=300&fit=crop',
+      rating: 4.8,
+      price: '₹1,08,000',
+      region: 'asia',
+      type: 'beach'
+    },
+    {
+      id: 3,
+      name: 'Tokyo',
+      country: 'Japan',
+      description: 'Modern metropolis blending ancient traditions with cutting-edge technology',
+      imageUrl: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=400&h=300&fit=crop',
+      rating: 4.7,
+      price: '₹2,16,000',
+      region: 'asia',
+      type: 'cultural'
+    },
+    {
+      id: 4,
+      name: 'New York',
+      country: 'United States',
+      description: 'The city that never sleeps, iconic skyline, Times Square, and Central Park',
+      imageUrl: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&h=300&fit=crop',
+      rating: 4.6,
+      price: '₹1,58,000',
+      region: 'americas',
+      type: 'adventure'
+    },
+    {
+      id: 5,
+      name: 'London',
+      country: 'United Kingdom',
+      description: 'Historic capital with Big Ben, British Museum, and vibrant arts scene',
+      imageUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=300&fit=crop',
+      rating: 4.7,
+      price: '₹1,45,000',
+      region: 'europe',
+      type: 'cultural'
+    },
+    {
+      id: 6,
+      name: 'Rome',
+      country: 'Italy',
+      description: 'Eternal City with Colosseum, Vatican City, and ancient Roman ruins',
+      imageUrl: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&h=300&fit=crop',
+      rating: 4.8,
+      price: '₹1,35,000',
+      region: 'europe',
+      type: 'cultural'
+    },
+    {
+      id: 7,
+      name: 'Dubai',
+      country: 'United Arab Emirates',
+      description: 'Futuristic city with Burj Khalifa, luxury shopping, and desert adventures',
+      imageUrl: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=400&h=300&fit=crop',
+      rating: 4.7,
+      price: '₹1,95,000',
+      region: 'asia',
+      type: 'luxury'
+    },
+    {
+      id: 8,
+      name: 'Sydney',
+      country: 'Australia',
+      description: 'Harbor city with Opera House, beautiful beaches, and outdoor lifestyle',
+      imageUrl: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=400&h=300&fit=crop',
+      rating: 4.6,
+      price: '₹1,75,000',
+      region: 'oceania',
+      type: 'beach'
+    },
+    {
+      id: 9,
+      name: 'Barcelona',
+      country: 'Spain',
+      description: 'Vibrant city with Gaudi architecture, beaches, and tapas culture',
+      imageUrl: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=400&h=300&fit=crop',
+      rating: 4.7,
+      price: '₹1,25,000',
+      region: 'europe',
+      type: 'cultural'
+    },
+    {
+      id: 10,
+      name: 'Singapore',
+      country: 'Singapore',
+      description: 'Garden city with Marina Bay Sands, street food, and multicultural charm',
+      imageUrl: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=400&h=300&fit=crop',
+      rating: 4.8,
+      price: '₹1,40,000',
+      region: 'asia',
+      type: 'family'
+    },
+    {
+      id: 11,
+      name: 'Cape Town',
+      country: 'South Africa',
+      description: 'Stunning coastal city with Table Mountain, beaches, and wine regions',
+      imageUrl: 'https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=400&h=300&fit=crop',
+      rating: 4.6,
+      price: '₹1,20,000',
+      region: 'africa',
+      type: 'adventure'
+    },
+    {
+      id: 12,
+      name: 'Bangkok',
+      country: 'Thailand',
+      description: 'Vibrant capital with temples, street food, and bustling markets',
+      imageUrl: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=400&h=300&fit=crop',
+      rating: 4.5,
+      price: '₹85,000',
+      region: 'asia',
+      type: 'budget'
+    }
+  ]
+
+  useEffect(() => {
+    fetchCities()
+  }, [])
+
+  const fetchCities = async () => {
+    try {
+      const response = await searchApi.getPopularCities()
+      setCities(response.data && response.data.length > 0 ? response.data : fallbackCities)
+    } catch (error) {
+      console.error('Failed to fetch cities:', error)
+      // Fallback to sample data if API fails
+      setCities(fallbackCities)
+    } finally {
+      setIsInitialLoading(false)
+    }
+  }
 
   const regions = [
     { id: 'all', name: 'All Regions' },
@@ -54,117 +210,11 @@ const CitySearch = () => {
     { id: 'luxury', name: 'Luxury ($$$)' }
   ]
 
-  const popularCities = [
-    { 
-      id: 1,
-      name: 'Paris', 
-      country: 'France', 
-      region: 'europe',
-      description: 'City of lights and romance',
-      image: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=300&fit=crop',
-      rating: 4.8,
-      price: '₹₹₹',
-      type: 'romantic',
-      activities: 156,
-      bestTime: 'Apr-Jun, Sep-Oct'
-    },
-    { 
-      id: 2,
-      name: 'Tokyo', 
-      country: 'Japan', 
-      region: 'asia',
-      description: 'Modern metropolis with traditional charm',
-      image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=300&fit=crop',
-      rating: 4.9,
-      price: '₹₹₹',
-      type: 'cultural',
-      activities: 203,
-      bestTime: 'Mar-May, Oct-Nov'
-    },
-    { 
-      id: 3,
-      name: 'New York', 
-      country: 'USA', 
-      region: 'americas',
-      description: 'The city that never sleeps',
-      image: 'https://images.unsplash.com/photo-1496442226666-8274e0d47c5a?w=400&h=300&fit=crop',
-      rating: 4.7,
-      price: '₹₹₹',
-      type: 'adventure',
-      activities: 189,
-      bestTime: 'Apr-Jun, Sep-Nov'
-    },
-    { 
-      id: 4,
-      name: 'London', 
-      country: 'UK', 
-      region: 'europe',
-      description: 'Historic capital with modern attractions',
-      image: 'https://images.unsplash.com/photo-1513635263979-8845079d7d5b?w=400&h=300&fit=crop',
-      rating: 4.6,
-      price: '₹₹₹',
-      type: 'cultural',
-      activities: 167,
-      bestTime: 'May-Sep'
-    },
-    { 
-      id: 5,
-      name: 'Dubai', 
-      country: 'UAE', 
-      region: 'asia',
-      description: 'Luxury shopping and ultramodern architecture',
-      image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop',
-      rating: 4.5,
-      price: '₹₹₹',
-      type: 'luxury',
-      activities: 98,
-      bestTime: 'Nov-Mar'
-    },
-    { 
-      id: 6,
-      name: 'Singapore', 
-      country: 'Singapore', 
-      region: 'asia',
-      description: 'Garden city with diverse culture',
-      image: 'https://images.unsplash.com/photo-1511739001486-6bfe10ba96a5?w=400&h=300&fit=crop',
-      rating: 4.7,
-      price: '₹₹',
-      type: 'family',
-      activities: 134,
-      bestTime: 'Feb-Apr'
-    },
-    { 
-      id: 7,
-      name: 'Bali', 
-      country: 'Indonesia', 
-      region: 'asia',
-      description: 'Tropical paradise with stunning beaches',
-      image: 'https://images.unsplash.com/photo-1537953764746-f6e532f4dbaf?w=400&h=300&fit=crop',
-      rating: 4.9,
-      price: '₹',
-      type: 'beach',
-      activities: 145,
-      bestTime: 'Apr-Oct'
-    },
-    { 
-      id: 8,
-      name: 'Rome', 
-      country: 'Italy', 
-      region: 'europe',
-      description: 'Eternal city of history and art',
-      image: 'https://images.unsplash.com/photo-1515522637-2b1b22c9e0b2?w=400&h=300&fit=crop',
-      rating: 4.8,
-      price: '₹₹',
-      type: 'cultural',
-      activities: 178,
-      bestTime: 'Apr-May, Sep-Oct'
-    }
-  ]
-
+  
   const handleSearch = (e) => {
     e.preventDefault()
     if (searchQuery.trim()) {
-      const filtered = popularCities.filter(city => 
+      const filtered = cities.filter(city => 
         city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         city.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
         city.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -176,18 +226,24 @@ const CitySearch = () => {
   }
 
   const getFilteredCities = () => {
-    let filtered = searchQuery ? searchResults : popularCities
+    let filtered = searchQuery ? (searchResults || []) : (cities || [])
     
+    // Ensure filtered is always an array
+    if (!Array.isArray(filtered)) {
+      filtered = []
+    }
+    
+    // Simple filtering by name/country since API doesn't have region/type/price fields
     if (selectedRegion !== 'all') {
-      filtered = filtered.filter(city => city.region === selectedRegion)
-    }
-    
-    if (selectedType !== 'all') {
-      filtered = filtered.filter(city => city.type === selectedType)
-    }
-    
-    if (priceRange !== 'all') {
-      filtered = filtered.filter(city => city.price === priceRange)
+      // Filter by region based on country (simple mapping)
+      const regionCountries = {
+        'europe': ['France', 'United Kingdom', 'Italy', 'Greece', 'Spain'],
+        'asia': ['Japan', 'Indonesia', 'Singapore', 'United Arab Emirates'],
+        'americas': ['United States']
+      }
+      filtered = filtered.filter(city => 
+        regionCountries[selectedRegion]?.includes(city.country)
+      )
     }
     
     return filtered
@@ -201,6 +257,19 @@ const CitySearch = () => {
     setSearchResults([])
   }
 
+  const toggleLike = (cityId) => {
+    setLikedCities(prev => {
+      const newLiked = new Set(prev)
+      if (newLiked.has(cityId)) {
+        newLiked.delete(cityId)
+      } else {
+        newLiked.add(cityId)
+      }
+      return newLiked
+    })
+  }
+
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -381,7 +450,7 @@ const CitySearch = () => {
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
                 <div className="relative h-48">
                   <img
-                    src={city.image}
+                    src={city.imageUrl}
                     alt={city.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
@@ -391,13 +460,13 @@ const CitySearch = () => {
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center"
                     onClick={(e) => {
                       e.stopPropagation()
-                      // Handle like functionality
+                      toggleLike(city.id)
                     }}
+                    className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center"
                   >
-                    <Heart className="w-5 h-5 text-white" />
+                    <Heart className={`w-5 h-5 ${likedCities.has(city.id) ? 'fill-red-500 text-red-500' : 'text-white'}`} />
                   </motion.button>
 
                   {/* Rating */}
@@ -423,11 +492,11 @@ const CitySearch = () => {
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                     <div className="flex items-center">
                       <Camera className="w-4 h-4 mr-1" />
-                      {city.activities} activities
+                      Popular destination
                     </div>
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      {city.bestTime}
+                      Visit anytime
                     </div>
                   </div>
                   
@@ -446,7 +515,7 @@ const CitySearch = () => {
         </div>
 
         {/* Empty State */}
-        {getFilteredCities().length === 0 && (
+        {!isInitialLoading && getFilteredCities().length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -464,6 +533,18 @@ const CitySearch = () => {
               Clear Filters
             </motion.button>
           </motion.div>
+        )}
+
+        {/* Initial Loading State */}
+        {isInitialLoading && (
+          <div className="text-center py-16">
+            <div className="flex justify-center items-center space-x-2 mb-4">
+              <div className="w-2 h-2 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+            <p className="text-gray-600">Discovering amazing destinations...</p>
+          </div>
         )}
       </div>
 
@@ -484,7 +565,7 @@ const CitySearch = () => {
           >
             <div className="relative h-64">
               <img
-                src={selectedCity.image}
+                src={selectedCity.imageUrl}
                 alt={selectedCity.name}
                 className="w-full h-full object-cover"
               />
@@ -509,33 +590,20 @@ const CitySearch = () => {
             </div>
 
             <div className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div className="text-center p-4 bg-gray-50 rounded-xl">
                   <Star className="w-6 h-6 text-yellow-400 fill-current mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{selectedCity.rating}</p>
-                  <p className="text-sm text-gray-600">Rating</p>
+                  <p className="text-2xl font-bold text-gray-900">Popular</p>
+                  <p className="text-sm text-gray-600">Destination</p>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <Camera className="w-6 h-6 text-sky-blue mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{selectedCity.activities}</p>
-                  <p className="text-sm text-gray-600">Activities</p>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <TrendingUp className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                  <p className="text-2xl font-bold text-gray-900">{selectedCity.price}</p>
-                  <p className="text-sm text-gray-600">Avg. Cost</p>
+                  <Globe className="w-6 h-6 text-sky-blue mx-auto mb-2" />
+                  <p className="text-2xl font-bold text-gray-900">{selectedCity.country}</p>
+                  <p className="text-sm text-gray-600">Country</p>
                 </div>
               </div>
 
               <p className="text-gray-700 mb-6 text-lg">{selectedCity.description}</p>
-
-              <div className="flex items-center gap-4 mb-6">
-                <div className="flex items-center text-gray-600">
-                  <Calendar className="w-5 h-5 mr-2" />
-                  <span className="font-medium">Best Time:</span>
-                  <span className="ml-1">{selectedCity.bestTime}</span>
-                </div>
-              </div>
 
               <div className="flex gap-4">
                 <Link

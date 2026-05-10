@@ -5,10 +5,12 @@ import { motion } from 'framer-motion'
 // Layouts
 import MainLayout from './layouts/MainLayout'
 import DashboardLayout from './layouts/DashboardLayout'
+import FullAppLayout from './layouts/FullAppLayout'
 
 // Pages
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import ForgotPassword from './pages/ForgotPassword'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import CreateTrip from './pages/CreateTrip'
@@ -23,6 +25,7 @@ import SharedTrip from './pages/SharedTrip'
 import Profile from './pages/Profile'
 import Notes from './pages/Notes'
 import AdminDashboard from './pages/AdminDashboard'
+import OAuthCallback from './pages/OAuthCallback'
 
 // Components
 import Loader from './components/Loader'
@@ -42,12 +45,32 @@ function App() {
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
+          <Route path="oauth/callback" element={<OAuthCallback />} />
+          <Route path="forgot-password" element={<ForgotPassword />} />
+          <Route path="reset-password" element={<ForgotPassword />} />
           <Route path="shared/:tripId" element={<SharedTrip />} />
         </Route>
 
         {/* Dashboard Routes - Now Public */}
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
+          <Route path="create-trip" element={<CreateTrip />} />
+          <Route path="my-trips" element={<MyTrips />} />
+          <Route path="itinerary-builder/:tripId" element={<ItineraryBuilder />} />
+          <Route path="itinerary-view/:tripId" element={<ItineraryView />} />
+          <Route path="city-search" element={<CitySearch />} />
+          <Route path="activity-search" element={<ActivitySearch />} />
+          <Route path="budget/:tripId" element={<Budget />} />
+          <Route path="packing/:tripId" element={<PackingChecklist />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="notes/:tripId" element={<Notes />} />
+          <Route path="admin" element={<AdminDashboard />} />
+        </Route>
+
+        {/* Full App Routes - With Sidebar */}
+        <Route path="/full-app" element={<FullAppLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="create-trip" element={<CreateTrip />} />
           <Route path="my-trips" element={<MyTrips />} />
           <Route path="itinerary-builder/:tripId" element={<ItineraryBuilder />} />

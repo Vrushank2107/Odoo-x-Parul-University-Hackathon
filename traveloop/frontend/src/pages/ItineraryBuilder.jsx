@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { 
   MapPin, 
   Clock, 
@@ -19,47 +19,93 @@ import {
   Save,
   GripVertical,
   X,
-  Check
+  Check,
+  Loader2
 } from 'lucide-react'
+import { tripApi } from '../api/tripApi'
+import { itineraryApi } from '../api/itineraryApi'
 
 const ItineraryBuilder = () => {
   const { tripId } = useParams()
+  const navigate = useNavigate()
   
+  const [trip, setTrip] = useState(null)
   const [itinerary, setItinerary] = useState({
+    title: '',
+    destination: '',
+    dates: '',
+    days: []
+  })
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState(null)
+
+  const fallbackTrip = {
+    id: 1,
     title: 'Paris Adventure 2024',
     destination: 'Paris, France',
-    dates: 'March 15-22, 2024',
+    description: 'Experience the magic of Paris with our carefully curated 7-day adventure.',
+    startDate: '2024-03-15',
+    endDate: '2024-03-22',
+    budget: 200000,
+    travelers: 2,
+    tripType: 'cultural',
+    status: 'PLANNED'
+  }
+
+  const fallbackItinerary = {
+    title: 'Paris Adventure 2024',
+    destination: 'Paris, France',
+    dates: 'March 15, 2024 - March 22, 2024',
     days: [
       {
         id: 1,
         date: 'March 15, 2024',
         activities: [
-          { 
-            id: 1, 
-            time: '09:00', 
-            activity: 'Breakfast at Café de Flore', 
+          {
+            id: 1,
+            time: '09:00',
+            activity: 'Arrival at Charles de Gaulle Airport',
+            location: 'CDG Airport',
+            type: 'transport',
+            duration: '2 hours',
+            notes: 'Flight from Mumbai, Terminal 2E'
+          },
+          {
+            id: 2,
+            time: '11:00',
+            activity: 'Check-in at Hotel Le Marais',
+            location: 'Hotel Le Marais',
+            type: 'accommodation',
+            duration: '1 hour',
+            notes: '4th Arrondissement, near Metro'
+          },
+          {
+            id: 3,
+            time: '13:00',
+            activity: 'Lunch at Café de Flore',
             location: 'Saint-Germain-des-Prés',
             type: 'dining',
-            duration: '1 hour',
-            notes: 'Famous historic café'
-          },
-          { 
-            id: 2, 
-            time: '11:00', 
-            activity: 'Visit Eiffel Tower', 
-            location: 'Champ de Mars',
-            type: 'sightseeing',
             duration: '2 hours',
-            notes: 'Book tickets in advance'
+            notes: 'Classic French café, famous for its history'
           },
-          { 
-            id: 3, 
-            time: '14:00', 
-            activity: 'Lunch at Le Jules Verne', 
-            location: 'Eiffel Tower',
+          {
+            id: 4,
+            time: '15:00',
+            activity: 'Visit Louvre Museum',
+            location: 'Louvre Museum',
+            type: 'sightseeing',
+            duration: '3 hours',
+            notes: 'Must see: Mona Lisa, Venus de Milo'
+          },
+          {
+            id: 5,
+            time: '19:00',
+            activity: 'Dinner Cruise on Seine River',
+            location: 'Seine River',
             type: 'dining',
-            duration: '1.5 hours',
-            notes: 'Michelin starred restaurant'
+            duration: '3 hours',
+            notes: 'Bateaux Mouches cruise with French cuisine'
           }
         ]
       },
@@ -67,19 +113,300 @@ const ItineraryBuilder = () => {
         id: 2,
         date: 'March 16, 2024',
         activities: [
-          { 
-            id: 4, 
-            time: '10:00', 
-            activity: 'Louvre Museum', 
-            location: 'Rue de Rivoli',
+          {
+            id: 6,
+            time: '09:30',
+            activity: 'Eiffel Tower Visit',
+            location: 'Champ de Mars',
             type: 'sightseeing',
-            duration: '4 hours',
-            notes: 'See Mona Lisa and Venus de Milo'
+            duration: '2 hours',
+            notes: 'Skip-the-line tickets, summit access'
+          },
+          {
+            id: 7,
+            time: '12:30',
+            activity: 'Lunch at Champ de Mars',
+            location: 'Eiffel Tower Area',
+            type: 'dining',
+            duration: '1.5 hours',
+            notes: 'Picnic style with tower views'
+          },
+          {
+            id: 8,
+            time: '14:00',
+            activity: 'Arc de Triomphe',
+            location: 'Charles de Gaulle Square',
+            type: 'sightseeing',
+            duration: '1.5 hours',
+            notes: 'Climb to top for panoramic views'
+          },
+          {
+            id: 9,
+            time: '16:30',
+            activity: 'Shopping on Champs-Élysées',
+            location: 'Champs-Élysées',
+            type: 'shopping',
+            duration: '2.5 hours',
+            notes: 'Luxury brands and souvenir shopping'
+          },
+          {
+            id: 10,
+            time: '19:30',
+            activity: 'Dinner in Montmartre',
+            location: 'Montmartre',
+            type: 'dining',
+            duration: '2 hours',
+            notes: 'Traditional French bistro'
+          }
+        ]
+      },
+      {
+        id: 3,
+        date: 'March 17, 2024',
+        activities: [
+          {
+            id: 11,
+            time: '10:00',
+            activity: 'Musée d\'Orsay',
+            location: 'Left Bank',
+            type: 'sightseeing',
+            duration: '3 hours',
+            notes: 'Impressionist art collection'
+          },
+          {
+            id: 12,
+            time: '13:30',
+            activity: 'Lunch at Latin Quarter',
+            location: 'Latin Quarter',
+            type: 'dining',
+            duration: '1.5 hours',
+            notes: 'Student area with affordable restaurants'
+          },
+          {
+            id: 13,
+            time: '15:00',
+            activity: 'Notre-Dame Cathedral',
+            location: 'Île de la Cité',
+            type: 'sightseeing',
+            duration: '1.5 hours',
+            notes: 'Gothic architecture masterpiece'
+          },
+          {
+            id: 14,
+            time: '17:00',
+            activity: 'Sainte-Chapelle',
+            location: 'Île de la Cité',
+            type: 'sightseeing',
+            duration: '1 hour',
+            notes: 'Stained glass windows'
           }
         ]
       }
     ]
-  })
+  }
+
+  useEffect(() => {
+    const fetchTrip = async () => {
+      try {
+        setLoading(true)
+        
+        // Handle sample tripId by using fallback data
+        let actualTripId = tripId
+        let useFallback = false
+        
+        if (tripId === 'sample') {
+          // Try to get user's trips first
+          try {
+            const tripsResponse = await tripApi.getTrips({ limit: 1 })
+            if (tripsResponse.data?.length > 0) {
+              actualTripId = tripsResponse.data[0].id
+              // Update URL to use actual trip ID
+              navigate(`/dashboard/itinerary-builder/${actualTripId}`, { replace: true })
+              return
+            } else {
+              useFallback = true
+            }
+          } catch (apiError) {
+            useFallback = true
+          }
+        }
+        
+        if (useFallback) {
+          // Use fallback data
+          setTrip(fallbackTrip)
+          setItinerary(fallbackItinerary)
+          setLoading(false)
+          return
+        }
+        
+        // Get trip details
+        const tripResponse = await tripApi.getTrip(actualTripId)
+        const tripData = tripResponse.data
+        setTrip(tripData)
+        
+        // Get itinerary data
+        const itineraryResponse = await itineraryApi.getItinerary(actualTripId)
+        const itineraryData = itineraryResponse.data
+        
+        // Format trip data for the builder
+        const formattedItinerary = {
+          title: tripData.title || '',
+          destination: tripData.destination || '',
+          dates: `${new Date(tripData.startDate).toLocaleDateString('en-US', { 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric' 
+          })} - ${new Date(tripData.endDate).toLocaleDateString('en-US', { 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric' 
+          })}`,
+          days: itineraryData.itinerary?.map((stop, index) => ({
+            id: stop.id || index + 1,
+            date: new Date(stop.date || tripData.startDate).toLocaleDateString('en-US', { 
+              month: 'long', 
+              day: 'numeric', 
+              year: 'numeric' 
+            }),
+            activities: stop.activities?.map(activity => ({
+              id: activity.id || Date.now() + Math.random(),
+              time: activity.time ? new Date(activity.time).toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+              }) : '09:00',
+              activity: activity.name || 'Activity',
+              location: activity.location || 'Location',
+              type: activity.category?.toLowerCase() || 'sightseeing',
+              duration: activity.duration ? `${activity.duration} minutes` : '1 hour',
+              notes: activity.description || ''
+            })) || []
+          })) || []
+        }
+        
+        setItinerary(formattedItinerary)
+      } catch (err) {
+        console.error('Failed to fetch trip:', err)
+        // Use fallback data on error
+        setTrip(fallbackTrip)
+        setItinerary(fallbackItinerary)
+        setError(null) // Clear error since we have fallback data
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (tripId) {
+      fetchTrip()
+    }
+  }, [tripId, navigate])
+
+  const saveItinerary = async () => {
+    try {
+      setSaving(true)
+      
+      // Don't save if using sample tripId
+      if (tripId === 'sample') {
+        setError('Cannot save sample trip. Please create a real trip first.')
+        return
+      }
+      
+      // Update trip basic info
+      const tripData = {
+        title: itinerary.title,
+        destination: itinerary.destination,
+        description: trip?.description || '',
+        startDate: trip?.startDate,
+        endDate: trip?.endDate,
+        budget: trip?.budget,
+        tripType: trip?.tripType,
+        travelers: trip?.travelers
+      }
+
+      await tripApi.updateTrip(tripId, tripData)
+      
+      // Get existing stops to compare
+      const existingStopsResponse = await itineraryApi.getStops(tripId)
+      const existingStops = existingStopsResponse.data
+      
+      // Create, update, or delete stops
+      for (const [index, day] of itinerary.days.entries()) {
+        const stopData = {
+          name: `Day ${index + 1}`,
+          date: new Date(day.date).toISOString(),
+          order: index
+        }
+        
+        const existingStop = existingStops.find(s => s.id === day.id)
+        
+        if (existingStop) {
+          // Update existing stop
+          await itineraryApi.updateStop(day.id, stopData)
+          
+          // Handle activities for this stop
+          const existingActivities = await itineraryApi.getActivities(day.id)
+          const existingActivitiesData = existingActivities.data
+          
+          // Create or update activities
+          for (const [activityIndex, activity] of day.activities.entries()) {
+            const activityData = {
+              name: activity.activity,
+              description: activity.notes,
+              location: activity.location,
+              time: activity.time ? new Date(`2024-01-01 ${activity.time}`).toISOString() : null,
+              duration: activity.duration?.includes('minutes') ? parseInt(activity.duration) : 60,
+              category: activity.type?.toUpperCase() || 'SIGHTSEEING'
+            }
+            
+            const existingActivity = existingActivitiesData.find(a => a.id === activity.id)
+            if (existingActivity) {
+              await itineraryApi.updateActivity(activity.id, activityData)
+            } else {
+              await itineraryApi.createActivity(day.id, activityData)
+            }
+          }
+          
+          // Delete activities that are no longer in the itinerary
+          for (const existingActivity of existingActivitiesData) {
+            if (!day.activities.find(a => a.id === existingActivity.id)) {
+              await itineraryApi.deleteActivity(existingActivity.id)
+            }
+          }
+        } else {
+          // Create new stop
+          const newStop = await itineraryApi.createStop(tripId, stopData)
+          
+          // Create activities for the new stop
+          for (const [activityIndex, activity] of day.activities.entries()) {
+            const activityData = {
+              name: activity.activity,
+              description: activity.notes,
+              location: activity.location,
+              time: activity.time ? new Date(`2024-01-01 ${activity.time}`).toISOString() : null,
+              duration: activity.duration?.includes('minutes') ? parseInt(activity.duration) : 60,
+              category: activity.type?.toUpperCase() || 'SIGHTSEEING'
+            }
+            
+            await itineraryApi.createActivity(newStop.data.id, activityData)
+          }
+        }
+      }
+      
+      // Delete stops that are no longer in the itinerary
+      for (const existingStop of existingStops) {
+        if (!itinerary.days.find(d => d.id === existingStop.id)) {
+          await itineraryApi.deleteStop(existingStop.id)
+        }
+      }
+      
+      // Navigate to view page after successful save
+      navigate(`/dashboard/itinerary-view/${tripId}`)
+    } catch (err) {
+      console.error('Failed to save trip:', err)
+      setError('Failed to save trip')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   const [newActivity, setNewActivity] = useState({
     time: '',
@@ -187,6 +514,51 @@ const ItineraryBuilder = () => {
     setDraggedActivity(null)
   }
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="flex justify-center items-center space-x-2 mb-4">
+            <div className="w-3 h-3 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-3 h-3 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+          <p className="text-gray-600">Loading trip builder...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Plane className="w-12 h-12 text-red-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">Error</h3>
+          <p className="text-gray-600 mb-8">{error}</p>
+          <div className="flex gap-4 justify-center">
+            <Link
+              to="/dashboard/my-trips"
+              className="px-6 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-xl font-semibold hover:shadow-lg flex items-center"
+            >
+              My Trips
+            </Link>
+            {error.includes('No trips found') && (
+              <Link
+                to="/dashboard/city-search"
+                className="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:shadow-lg flex items-center"
+              >
+                Create New Trip
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -215,10 +587,16 @@ const ItineraryBuilder = () => {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-4 py-2 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 flex items-center"
+                onClick={saveItinerary}
+                disabled={saving}
+                className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:shadow-lg flex items-center disabled:opacity-50"
               >
-                <Save className="w-4 h-4 mr-2" />
-                Save Draft
+                {saving ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
+                {saving ? 'Saving...' : 'Save'}
               </motion.button>
               <Link
                 to={`/dashboard/itinerary-view/${tripId}`}

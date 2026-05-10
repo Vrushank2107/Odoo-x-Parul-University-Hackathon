@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import axios from 'axios'
+import { authApi } from '../api/authApi'
 
 const AuthContext = createContext()
 
@@ -15,19 +15,11 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      // For development: Auto-login if token exists
-      setUser({
-        id: 1,
-        name: 'Test User',
-        email: 'test@example.com'
-      })
-      setLoading(false)
-      // Verify token with backend
-      // verifyToken()
+      verifyToken()
     } else {
       setLoading(false)
     }
@@ -35,11 +27,15 @@ export const AuthProvider = ({ children }) => {
 
   const verifyToken = async () => {
     try {
-      const response = await axios.get('/api/auth/verify')
-      setUser(response.data.user)
+      console.log('AuthContext - Verifying token...')
+      const response = await authApi.getMe()
+      console.log('AuthContext - getMe response:', response)
+      setUser(response.data.data)
+      console.log('AuthContext - User set:', response.data.data)
     } catch (error) {
+      console.log('AuthContext - Token verification failed:', error)
       localStorage.removeItem('token')
-      delete axios.defaults.headers.common['Authorization']
+      localStorage.removeItem('refreshToken')
     } finally {
       setLoading(false)
     }
@@ -47,48 +43,53 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      // For development: Mock login without backend
-      const mockToken = 'mock-jwt-token-' + Date.now()
-      const mockUser = {
-        id: 1,
-        name: 'Test User',
-        email: email
-      }
+      console.log('AuthContext - Attempting login with:', email)
+      const response = await authApi.login({ email, password })
+      console.log('AuthContext - Login response:', response)
+      const { user, accessToken, refreshToken } = response.data.data
       
-      localStorage.setItem('token', mockToken)
-      // axios.defaults.headers.common['Authorization'] = `Bearer ${mockToken}`
-      setUser(mockUser)
+      localStorage.setItem('token', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
+      setUser(user)
+      console.log('AuthContext - Login successful, user set:', user)
       
-      return { success: true }
+      return { success: true, data: response.data }
     } catch (error) {
+      console.log('AuthContext - Login failed:', error)
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Login failed' 
+        error: error.message || 'Login failed' 
       }
     }
   }
 
   const signup = async (userData) => {
     try {
-      const response = await axios.post('/api/auth/signup', userData)
-      const { token, user } = response.data
+      const response = await authApi.signup(userData)
+      const { user, accessToken, refreshToken } = response.data
       
-      localStorage.setItem('token', token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      localStorage.setItem('token', accessToken)
+      localStorage.setItem('refreshToken', refreshToken)
       setUser(user)
       
-      return { success: true }
+      return { success: true, data: response.data }
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Signup failed' 
+        error: error.message || 'Signup failed' 
       }
     }
   }
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authApi.logout()
+    } catch (error) {
+      // Continue with logout even if API call fails
+    }
+    
     localStorage.removeItem('token')
-    delete axios.defaults.headers.common['Authorization']
+    localStorage.removeItem('refreshToken')
     setUser(null)
   }
 

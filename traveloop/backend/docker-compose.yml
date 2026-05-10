@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: traveloop-db
+    environment:
+      POSTGRES_DB: traveloop_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: traveloop-api
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/traveloop_db
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-in-production
+      NODE_ENV: development
+      PORT: 5000
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src/uploads:/app/src/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Prisma Studio (Development only)
+  studio:
+    image: node:18-alpine
+    container_name: traveloop-studio
+    working_dir: /app
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/traveloop_db
+    ports:
+      - "5555:5555"
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    command: sh -c "npm install && npx prisma studio --hostname 0.0.0.0"
+    profiles:
+      - dev
+
+volumes:
+  postgres_data:

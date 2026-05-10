@@ -1,0 +1,67 @@
+services:
+  # Types of service
+  type: web
+  
+  # Name of your service
+  name: traveloop-backend
+  
+  # Environment variables
+  env:
+    # Database URL (use Render's managed PostgreSQL)
+    DATABASE_URL:
+      value: ${DATABASE_URL}
+    
+    # JWT Secrets (generate secure random strings)
+    JWT_SECRET:
+      value: ${JWT_SECRET}
+    JWT_REFRESH_SECRET:
+      value: ${JWT_REFRESH_SECRET}
+    
+    # Server configuration
+    NODE_ENV: production
+    PORT: 5000
+    FRONTEND_URL: ${FRONTEND_URL}
+
+  # Build configuration
+  buildCommand: "npm install && npm run build"
+  startCommand: "npm start"
+
+  # Runtime
+  runtime: node
+
+  # Node version
+  nodeVersion: "18"
+
+  # Health check
+  healthCheckPath: /health
+
+  # Auto-deploy configuration
+  autoDeploy: true
+
+  # Service plan
+  plan: free
+
+# Service instance configuration
+instances:
+  - type: web
+    name: traveloop-backend
+    env:
+      DATABASE_URL:
+        value: ${DATABASE_URL}
+      JWT_SECRET:
+        value: ${JWT_SECRET}
+      JWT_REFRESH_SECRET:
+        value: ${JWT_REFRESH_SECRET}
+      NODE_ENV: production
+      PORT: 5000
+      FRONTEND_URL: ${FRONTEND_URL}
+    buildCommand: "npm install && npm run build"
+    startCommand: "npm start"
+    runtime: node
+    nodeVersion: "18"
+    healthCheckPath: /health
+    autoDeploy: true
+    plan: free
+
+# Version
+version: "1.0.0"

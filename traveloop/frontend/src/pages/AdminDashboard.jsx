@@ -98,10 +98,10 @@ const AdminDashboard = () => {
   ]
 
   const recentTrips = [
-    { id: 1, title: 'Paris Adventure', user: 'Sarah Johnson', date: '2024-03-20', status: 'confirmed', budget: '$5,000' },
-    { id: 2, title: 'Tokyo Explorer', user: 'Mike Chen', date: '2024-03-19', status: 'pending', budget: '$7,000' },
-    { id: 3, title: 'Bali Retreat', user: 'Emma Wilson', date: '2024-03-18', status: 'confirmed', budget: '$3,000' },
-    { id: 4, title: 'NYC Weekend', user: 'Alex Kumar', date: '2024-03-17', status: 'cancelled', budget: '$2,500' }
+    { id: 1, title: 'Paris Adventure', user: 'Sarah Johnson', date: '2024-03-20', status: 'confirmed', budget: '₹4,16,500' },
+    { id: 2, title: 'Tokyo Explorer', user: 'Mike Chen', date: '2024-03-19', status: 'pending', budget: '₹5,83,100' },
+    { id: 3, title: 'Bali Retreat', user: 'Emma Wilson', date: '2024-03-18', status: 'confirmed', budget: '₹2,49,900' },
+    { id: 4, title: 'NYC Weekend', user: 'Alex Kumar', date: '2024-03-17', status: 'cancelled', budget: '₹2,08,250' }
   ]
 
   const systemAlerts = [

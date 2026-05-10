@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { 
@@ -14,118 +14,85 @@ import {
   Globe,
   Heart,
   Zap,
-  Shield
+  Shield,
+  Plus
 } from 'lucide-react'
+import { tripApi } from '../api/tripApi'
 
 const Dashboard = () => {
-  const stats = [
-    {
-      id: 1,
-      title: "Total Trips",
-      value: "12",
-      change: "+2 this month",
-      icon: Plane,
-      color: "from-blue-500 to-cyan-500",
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-600"
-    },
-    {
-      id: 2,
-      title: "Total Spent",
-      value: "₹7,01,350",
-      change: "+₹99,600 this month",
-      icon: TrendingUp,
-      color: "from-green-500 to-emerald-500",
-      bgColor: "bg-green-50",
-      textColor: "text-green-600"
-    },
-    {
-      id: 3,
-      title: "Upcoming Trips",
-      value: "3",
-      change: "Next: June 20",
-      icon: Calendar,
-      color: "from-yellow-500 to-orange-500",
-      bgColor: "bg-yellow-50",
-      textColor: "text-yellow-600"
-    },
-    {
-      id: 4,
-      title: "Travel Companions",
-      value: "28",
-      change: "+5 new this month",
-      icon: Users,
-      color: "from-purple-500 to-pink-500",
-      bgColor: "bg-purple-50",
-      textColor: "text-purple-600"
-    }
-  ]
+  const [stats, setStats] = useState([])
+  const [recentTrips, setRecentTrips] = useState([])
+  const [upcomingTrips, setUpcomingTrips] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  const recentTrips = [
-    {
-      id: 1,
-      name: "Paris Adventure",
-      destination: "Paris, France",
-      date: "March 15-22, 2024",
-      status: "completed",
-      image: "https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=200&fit=crop",
-      rating: 4.8,
-      spent: "₹1,83,000"
-    },
-    {
-      id: 2,
-      name: "Tokyo Explorer",
-      destination: "Tokyo, Japan",
-      date: "February 10-18, 2024",
-      status: "completed",
-      image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=200&fit=crop",
-      rating: 4.9,
-      spent: "₹2,16,000"
-    },
-    {
-      id: 3,
-      name: "NYC Weekend",
-      destination: "New York, USA",
-      date: "January 5-7, 2024",
-      status: "completed",
-      image: "https://images.unsplash.com/photo-1496442226666-8274e0d47c5a?w=400&h=200&fit=crop",
-      rating: 4.6,
-      spent: "₹1,58,000"
-    }
-  ]
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
 
-  const upcomingTrips = [
-    {
-      id: 1,
-      name: "Summer in Greece",
-      destination: "Santorini, Greece",
-      date: "June 20-30, 2024",
-      status: "planned",
-      image: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400&h=200&fit=crop",
-      daysLeft: 45,
-      budget: "₹2,91,000"
-    },
-    {
-      id: 2,
-      name: "London Business Trip",
-      destination: "London, UK",
-      date: "May 10-15, 2024",
-      status: "planned",
-      image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=400&h=200&fit=crop",
-      daysLeft: 15,
-      budget: "₹2,32,000"
-    },
-    {
-      id: 3,
-      name: "Dubai Luxury",
-      destination: "Dubai, UAE",
-      date: "April 25-28, 2024",
-      status: "planned",
-      image: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=200&fit=crop",
-      daysLeft: 5,
-      budget: "₹3,49,000"
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch all data in parallel
+      const [statsResponse, recentResponse, upcomingResponse] = await Promise.all([
+        tripApi.getTripStats(),
+        tripApi.getRecentTrips(3),
+        tripApi.getUpcomingTrips(3)
+      ])
+
+      // Transform stats data for display
+      const statsData = [
+        {
+          id: 1,
+          title: "Total Trips",
+          value: statsResponse.data.totalTrips?.toString() || "0",
+          change: statsResponse.data.completedTrips ? `+${statsResponse.data.completedTrips} completed` : "No completed trips",
+          icon: Plane,
+          color: "from-blue-500 to-cyan-500",
+          bgColor: "bg-blue-50",
+          textColor: "text-blue-600"
+        },
+        {
+          id: 2,
+          title: "Total Spent",
+          value: `₹${statsResponse.data.totalSpent?.toLocaleString('en-IN') || "0"}`,
+          change: statsResponse.data.totalBudget ? `Budget: ₹${statsResponse.data.totalBudget.toLocaleString('en-IN')}` : "No budget set",
+          icon: TrendingUp,
+          color: "from-green-500 to-emerald-500",
+          bgColor: "bg-green-50",
+          textColor: "text-green-600"
+        },
+        {
+          id: 3,
+          title: "Upcoming Trips",
+          value: statsResponse.data.upcomingTrips?.toString() || "0",
+          change: statsResponse.data.activeTrips ? `${statsResponse.data.activeTrips} active` : "No active trips",
+          icon: Calendar,
+          color: "from-yellow-500 to-orange-500",
+          bgColor: "bg-yellow-50",
+          textColor: "text-yellow-600"
+        },
+        {
+          id: 4,
+          title: "Avg Rating",
+          value: statsResponse.data.avgRating ? statsResponse.data.avgRating.toFixed(1) : "0.0",
+          change: "Based on completed trips",
+          icon: Star,
+          color: "from-purple-500 to-pink-500",
+          bgColor: "bg-purple-50",
+          textColor: "text-purple-600"
+        }
+      ]
+
+      setStats(statsData)
+      setRecentTrips(recentResponse.data || [])
+      setUpcomingTrips(upcomingResponse.data || [])
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error)
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
@@ -226,44 +193,66 @@ const Dashboard = () => {
             </div>
             
             <div className="space-y-4">
-              {recentTrips.map((trip, index) => (
-                <motion.div
-                  key={trip.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                  className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer"
-                >
-                  <img
-                    src={trip.image}
-                    alt={trip.name}
-                    className="w-16 h-16 rounded-lg object-cover"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{trip.name}</h3>
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <MapPin className="w-3 h-3 mr-1" />
-                      {trip.destination}
-                    </p>
-                    <p className="text-xs text-gray-500 flex items-center mt-1">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      {trip.date}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center mb-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-medium ml-1">{trip.rating}</span>
+              {Array.isArray(recentTrips) && recentTrips.length > 0 ? (
+                recentTrips.map((trip, index) => (
+                <Link key={trip.id} to={`/dashboard/itinerary-view/${trip.id}`}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
+                    whileHover={{ scale: 1.02 }}
+                    className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer mb-3"
+                  >
+                    <img
+                      src={trip.coverImage || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=200&h=200&fit=crop'}
+                      alt={trip.title}
+                      className="w-16 h-16 rounded-lg object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 truncate">{trip.title}</h3>
+                      <p className="text-sm text-gray-600 flex items-center">
+                        <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">{trip.destination}</span>
+                      </p>
+                      <p className="text-xs text-gray-500 flex items-center mt-1">
+                        <Calendar className="w-3 h-3 mr-1 flex-shrink-0" />
+                        {trip.startDate && trip.endDate 
+                          ? `${new Date(trip.startDate).toLocaleDateString()} - ${new Date(trip.endDate).toLocaleDateString()}`
+                          : trip.dates || 'Dates not set'}
+                      </p>
                     </div>
-                    <p className="text-sm font-semibold text-gray-900">{trip.spent}</p>
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-100 bg-green-800 rounded-full">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Completed
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
+                    <div className="text-right flex-shrink-0">
+                      {trip.rating && (
+                        <div className="flex items-center justify-end mb-1">
+                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                          <span className="text-sm font-medium ml-1">{trip.rating}</span>
+                        </div>
+                      )}
+                      <p className="text-sm font-semibold text-gray-900">
+                        ₹{(trip.spent || 0).toLocaleString('en-IN')}
+                      </p>
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-100 bg-green-800 rounded-full mt-1">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        {trip.status || 'Completed'}
+                      </span>
+                    </div>
+                  </motion.div>
+                </Link>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No recent trips found</p>
+                  <p className="text-sm text-gray-400 mt-1">Your completed trips will appear here</p>
+                  <Link
+                    to="/dashboard/create-trip"
+                    className="mt-4 inline-flex items-center text-sky-blue hover:text-sky-blue/80 font-medium"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Create your first trip
+                  </Link>
+                </div>
+              )}
             </div>
           </motion.div>
 
@@ -286,40 +275,62 @@ const Dashboard = () => {
             </div>
             
             <div className="space-y-4">
-              {upcomingTrips.map((trip, index) => (
-                <motion.div
-                  key={trip.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.7 + index * 0.1 }}
-                  whileHover={{ scale: 1.02 }}
-                  className="flex items-center space-x-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all cursor-pointer"
-                >
-                  <img
-                    src={trip.image}
-                    alt={trip.name}
-                    className="w-16 h-16 rounded-lg object-cover"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{trip.name}</h3>
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <MapPin className="w-3 h-3 mr-1" />
-                      {trip.destination}
-                    </p>
-                    <p className="text-xs text-gray-500 flex items-center mt-1">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {trip.daysLeft} days left
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-gray-900">{trip.budget}</p>
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-100 bg-blue-800 rounded-full">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      Planned
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
+              {Array.isArray(upcomingTrips) && upcomingTrips.length > 0 ? (
+                upcomingTrips.map((trip, index) => (
+                <Link key={trip.id} to={`/dashboard/itinerary-view/${trip.id}`}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.7 + index * 0.1 }}
+                    whileHover={{ scale: 1.02 }}
+                    className="flex items-center space-x-4 p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-all cursor-pointer mb-3"
+                  >
+                    <img
+                      src={trip.coverImage || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=200&h=200&fit=crop'}
+                      alt={trip.title}
+                      className="w-16 h-16 rounded-lg object-cover"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 truncate">{trip.title}</h3>
+                      <p className="text-sm text-gray-600 flex items-center">
+                        <MapPin className="w-3 h-3 mr-1 flex-shrink-0" />
+                        <span className="truncate">{trip.destination}</span>
+                      </p>
+                      <p className="text-xs text-gray-500 flex items-center mt-1">
+                        <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+                        {trip.daysUntil !== undefined 
+                          ? `${trip.daysUntil} days left`
+                          : trip.startDate 
+                            ? `${Math.ceil((new Date(trip.startDate) - new Date()) / (1000 * 60 * 60 * 24))} days left`
+                            : 'Upcoming'}
+                      </p>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-semibold text-gray-900">
+                        ₹{(trip.budget || 0).toLocaleString('en-IN')}
+                      </p>
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-medium text-blue-100 bg-blue-800 rounded-full mt-1">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {trip.status || 'Planned'}
+                      </span>
+                    </div>
+                  </motion.div>
+                </Link>
+                ))
+              ) : (
+                <div className="text-center py-8">
+                  <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-gray-500">No upcoming trips found</p>
+                  <p className="text-sm text-gray-400 mt-1">Your planned trips will appear here</p>
+                  <Link
+                    to="/dashboard/create-trip"
+                    className="mt-4 inline-flex items-center text-sky-blue hover:text-sky-blue/80 font-medium"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Plan your next trip
+                  </Link>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>

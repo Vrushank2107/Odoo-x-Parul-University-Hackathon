@@ -41,6 +41,8 @@ const Profile = () => {
 
   const [isEditing, setIsEditing] = useState(false)
   const [activeTab, setActiveTab] = useState('personal')
+  const [profileImage, setProfileImage] = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
 
   const tabs = [
     { id: 'personal', name: 'Personal Info', icon: User },
@@ -67,10 +69,30 @@ const Profile = () => {
     }
   }
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        setProfileImage(file)
+        const reader = new FileReader()
+        reader.onloadend = () => {
+          setImagePreview(reader.result)
+        }
+        reader.readAsDataURL(file)
+      } else {
+        alert('Please select an image file')
+      }
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
     setIsEditing(false)
     // Handle profile update logic here
+    console.log('Profile updated:', profile)
+    if (profileImage) {
+      console.log('Profile image to upload:', profileImage)
+    }
   }
 
   return (
@@ -96,12 +118,30 @@ const Profile = () => {
         >
           <div className="flex flex-col lg:flex-row items-center lg:items-start gap-8 mb-8">
             <div className="relative">
-              <div className="w-32 h-32 bg-gradient-to-r from-sky-blue to-cyan rounded-full flex items-center justify-center text-white text-4xl font-bold">
-                {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
+              <div className="w-32 h-32 rounded-full overflow-hidden bg-gradient-to-r from-sky-blue to-cyan">
+                {imagePreview ? (
+                  <img 
+                    src={imagePreview} 
+                    alt="Profile" 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white text-4xl font-bold">
+                    {profile.firstName.charAt(0)}{profile.lastName.charAt(0)}
+                  </div>
+                )}
               </div>
+              <input
+                type="file"
+                id="profileImage"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+              />
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                onClick={() => document.getElementById('profileImage').click()}
                 className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg"
               >
                 <Camera className="w-5 h-5 text-gray-600" />

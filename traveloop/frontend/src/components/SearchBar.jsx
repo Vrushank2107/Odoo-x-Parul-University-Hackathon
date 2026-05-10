@@ -155,10 +155,10 @@ const SearchBar = ({
                     className="input-modern"
                   >
                     <option value="">Any price</option>
-                    <option value="0-50">$0 - $50</option>
-                    <option value="50-100">$50 - $100</option>
-                    <option value="100-200">$100 - $200</option>
-                    <option value="200+">$200+</option>
+                    <option value="0-50">₹0 - ₹4,000</option>
+                    <option value="50-100">₹4,000 - ₹8,300</option>
+                    <option value="100-200">₹8,300 - ₹16,600</option>
+                    <option value="200+">₹16,600+</option>
                   </select>
                 </div>
 

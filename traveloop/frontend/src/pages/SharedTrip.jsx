@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import { 
   Share2, 
   Copy, 
@@ -29,6 +30,8 @@ import {
 
 const SharedTrip = () => {
   const { tripId } = useParams()
+  const navigate = useNavigate()
+  const { user } = useAuth()
   const [copied, setCopied] = useState(false)
   const [email, setEmail] = useState('')
   const [showShareModal, setShowShareModal] = useState(false)
@@ -38,7 +41,7 @@ const SharedTrip = () => {
     title: 'Paris Adventure 2024',
     destination: 'Paris, France',
     dates: 'March 15-22, 2024',
-    image: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=1200&h=600&fit=crop',
+    image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&h=600&fit=crop',
     description: 'Experience the magic of Paris with our carefully curated 7-day adventure. From the Eiffel Tower to the Louvre, from charming cafés to world-class museums.',
     highlights: ['Eiffel Tower Summit', 'Louvre Museum', 'Seine River Cruise', 'Versailles Day Trip'],
     rating: 4.9,
@@ -92,6 +95,22 @@ const SharedTrip = () => {
     }
   }
 
+  const handleCreateTrip = () => {
+    if (user) {
+      navigate('/dashboard/create-trip')
+    } else {
+      navigate('/login')
+    }
+  }
+
+  const handleExploreMoreTrips = () => {
+    if (user) {
+      navigate('/dashboard/my-trips')
+    } else {
+      navigate('/login')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50">
       {/* Hero Section */}
@@ -100,6 +119,9 @@ const SharedTrip = () => {
           src={tripData.image}
           alt={tripData.destination}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.target.src = "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=600&fit=crop";
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         
@@ -287,6 +309,7 @@ const SharedTrip = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleCreateTrip}
               className="px-8 py-4 bg-white text-sky-blue rounded-xl font-semibold hover:shadow-lg flex items-center"
             >
               <Plus className="w-5 h-5 mr-2" />
@@ -295,6 +318,7 @@ const SharedTrip = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleExploreMoreTrips}
               className="px-8 py-4 bg-white/20 text-white rounded-xl font-semibold hover:bg-white/30 flex items-center border border-white/30"
             >
               <Globe className="w-5 h-5 mr-2" />

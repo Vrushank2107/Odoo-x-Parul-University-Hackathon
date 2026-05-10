@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import axios from 'axios'
+import { tripApi } from '../api/tripApi'
+import { itineraryApi } from '../api/itineraryApi'
+import { useAuth } from './AuthContext'
 
 const TripContext = createContext()
 
@@ -12,19 +14,22 @@ export const useTrip = () => {
 }
 
 export const TripProvider = ({ children }) => {
+  const { user } = useAuth()
   const [trips, setTrips] = useState([])
   const [currentTrip, setCurrentTrip] = useState(null)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    fetchTrips()
-  }, [])
+    if (user) {
+      fetchTrips()
+    }
+  }, [user])
 
   const fetchTrips = async () => {
     try {
       setLoading(true)
-      const response = await axios.get('/api/trips')
-      setTrips(response.data)
+      const response = await tripApi.getTrips()
+      setTrips(response.data.data)
     } catch (error) {
       console.error('Failed to fetch trips:', error)
     } finally {
@@ -35,14 +40,14 @@ export const TripProvider = ({ children }) => {
   const createTrip = async (tripData) => {
     try {
       setLoading(true)
-      const response = await axios.post('/api/trips', tripData)
-      const newTrip = response.data
+      const response = await tripApi.createTrip(tripData)
+      const newTrip = response.data.data
       setTrips(prev => [...prev, newTrip])
       return { success: true, trip: newTrip }
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to create trip' 
+        error: error.message || 'Failed to create trip' 
       }
     } finally {
       setLoading(false)
@@ -52,8 +57,8 @@ export const TripProvider = ({ children }) => {
   const updateTrip = async (tripId, tripData) => {
     try {
       setLoading(true)
-      const response = await axios.put(`/api/trips/${tripId}`, tripData)
-      const updatedTrip = response.data
+      const response = await tripApi.updateTrip(tripId, tripData)
+      const updatedTrip = response.data.data
       setTrips(prev => prev.map(trip => 
         trip.id === tripId ? updatedTrip : trip
       ))
@@ -64,7 +69,7 @@ export const TripProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to update trip' 
+        error: error.message || 'Failed to update trip' 
       }
     } finally {
       setLoading(false)
@@ -74,7 +79,7 @@ export const TripProvider = ({ children }) => {
   const deleteTrip = async (tripId) => {
     try {
       setLoading(true)
-      await axios.delete(`/api/trips/${tripId}`)
+      await tripApi.deleteTrip(tripId)
       setTrips(prev => prev.filter(trip => trip.id !== tripId))
       if (currentTrip?.id === tripId) {
         setCurrentTrip(null)
@@ -83,7 +88,7 @@ export const TripProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to delete trip' 
+        error: error.message || 'Failed to delete trip' 
       }
     } finally {
       setLoading(false)
@@ -93,25 +98,25 @@ export const TripProvider = ({ children }) => {
   const getTrip = async (tripId) => {
     try {
       setLoading(true)
-      const response = await axios.get(`/api/trips/${tripId}`)
-      const trip = response.data
+      const response = await tripApi.getTrip(tripId)
+      const trip = response.data.data
       setCurrentTrip(trip)
       return { success: true, trip }
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to fetch trip' 
+        error: error.message || 'Failed to fetch trip' 
       }
     } finally {
       setLoading(false)
     }
   }
 
-  const addActivity = async (tripId, activityData) => {
+  const addActivity = async (tripId, stopId, activityData) => {
     try {
       setLoading(true)
-      const response = await axios.post(`/api/trips/${tripId}/activities`, activityData)
-      const newActivity = response.data
+      const response = await itineraryApi.createActivity(stopId, activityData)
+      const newActivity = response.data.data
       
       if (currentTrip?.id === tripId) {
         setCurrentTrip(prev => ({
@@ -124,7 +129,7 @@ export const TripProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to add activity' 
+        error: error.message || 'Failed to add activity' 
       }
     } finally {
       setLoading(false)
@@ -134,8 +139,8 @@ export const TripProvider = ({ children }) => {
   const updateActivity = async (tripId, activityId, activityData) => {
     try {
       setLoading(true)
-      const response = await axios.put(`/api/trips/${tripId}/activities/${activityId}`, activityData)
-      const updatedActivity = response.data
+      const response = await itineraryApi.updateActivity(activityId, activityData)
+      const updatedActivity = response.data.data
       
       if (currentTrip?.id === tripId) {
         setCurrentTrip(prev => ({
@@ -150,7 +155,7 @@ export const TripProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to update activity' 
+        error: error.message || 'Failed to update activity' 
       }
     } finally {
       setLoading(false)
@@ -160,7 +165,7 @@ export const TripProvider = ({ children }) => {
   const deleteActivity = async (tripId, activityId) => {
     try {
       setLoading(true)
-      await axios.delete(`/api/trips/${tripId}/activities/${activityId}`)
+      await itineraryApi.deleteActivity(activityId)
       
       if (currentTrip?.id === tripId) {
         setCurrentTrip(prev => ({
@@ -173,7 +178,7 @@ export const TripProvider = ({ children }) => {
     } catch (error) {
       return { 
         success: false, 
-        error: error.response?.data?.message || 'Failed to delete activity' 
+        error: error.message || 'Failed to delete activity' 
       }
     } finally {
       setLoading(false)

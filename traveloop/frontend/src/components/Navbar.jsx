@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
-import { 
+import { useAuth } from '../hooks/useAuth'
+import {
   Menu, 
-  X, 
-  Plane, 
-  User, 
+  X,
+  Plane,
+  User,
   Settings,
   MapPin,
   Calendar,
@@ -14,41 +15,40 @@ import {
   LogOut,
   Bell,
   Heart,
-  Globe
+  Globe,
+  ChevronDown
 } from 'lucide-react'
 
 const Navbar = ({ variant = 'default' }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [user, setUser] = useState(null)
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
+  const { user, logout, loading } = useAuth()
   const location = useLocation()
+  const dropdownRef = useRef(null)
 
-  // Simulate authentication state
+  
+  // Close dropdown when clicking outside
   useEffect(() => {
-    // In real app, this would come from auth context
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
-    const userData = localStorage.getItem('user')
-    if (isAuthenticated && userData) {
-      setUser(JSON.parse(userData))
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
 
-  // Public nav items (always visible)
+  // Public nav items (always visible) - Essential pages only
   const publicNavItems = [
     { path: '/', label: 'Home', icon: Plane, visible: true },
-    { path: '/shared/:tripId', label: 'Shared Trip', icon: Globe, visible: true },
-  ]
-
-  // Authenticated nav items (only when logged in)
-  const authNavItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: MapPin, visible: true },
-    { path: '/dashboard/my-trips', label: 'My Trips', icon: Calendar, visible: true },
-    { path: '/dashboard/itinerary-builder/sample', label: 'Itinerary Builder', icon: Calendar, visible: true },
-    { path: '/dashboard/budget', label: 'Budget', icon: TrendingUp, visible: true },
-    { path: '/dashboard/packing/sample', label: 'Packing List', icon: Package, visible: true },
+    { path: '/shared/sample', label: 'Shared Trip', icon: Globe, visible: true },
   ]
 
   // Combine nav items based on auth state
-  const navItems = [...publicNavItems, ...(user ? authNavItems : [])]
+  const navItems = publicNavItems
 
   const isActivePath = (path) => {
     if (path === '/') {
@@ -57,6 +57,7 @@ const Navbar = ({ variant = 'default' }) => {
     return location.pathname.startsWith(path)
   }
 
+  
   return (
     <motion.nav
       initial={{ y: -20, opacity: 0 }}
@@ -64,9 +65,10 @@ const Navbar = ({ variant = 'default' }) => {
       transition={{ duration: 0.3 }}
       className={`${
         variant === 'transparent' 
-          ? 'bg-white/80 backdrop-blur-md border-b border-white/20' 
+          ? 'bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm' 
           : 'bg-white shadow-lg border-b border-gray-100'
       } sticky top-0 z-50 transition-all duration-300`}
+      style={{ display: 'block' }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
@@ -109,58 +111,63 @@ const Navbar = ({ variant = 'default' }) => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               // Authenticated user actions
-              <div className="flex items-center space-x-3">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-sky-blue/10 to-cyan/10 rounded-lg"
+              <div className="relative" ref={dropdownRef}>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-sky-blue/10 to-cyan/10 rounded-lg hover:from-sky-blue/20 hover:to-cyan/20 transition-all"
                 >
                   <div className="w-8 h-8 bg-gradient-to-r from-sky-blue to-cyan rounded-full flex items-center justify-center">
                     <User className="w-4 h-4 text-white" />
                   </div>
-                  <div>
-                    <span className="text-sm font-semibold text-gray-900">{user.firstName}</span>
-                    <span className="text-xs text-gray-500">{user.email}</span>
+                  <div className="text-left">
+                    <span className="text-sm font-semibold text-gray-900 block">{user.name}</span>
+                    <span className="text-xs text-gray-500 block">{user.email}</span>
                   </div>
-                </motion.div>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all relative"
-                >
-                  <Bell className="w-5 h-5" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
                 </motion.button>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all"
-                >
-                  <Heart className="w-5 h-5" />
-                </motion.button>
-                
-                <Link
-                  to="/dashboard/profile"
-                  className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all"
-                >
-                  <Settings className="w-5 h-5" />
-                </Link>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    localStorage.removeItem('isAuthenticated')
-                    localStorage.removeItem('user')
-                    setUser(null)
-                    window.location.href = '/'
-                  }}
-                  className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="text-sm font-medium">Logout</span>
-                </motion.button>
+
+                {/* Profile Dropdown Menu */}
+                <AnimatePresence>
+                  {isProfileDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50"
+                    >
+                      <div className="py-2">
+                        {/* Settings */}
+                        <Link
+                          to="/dashboard/profile"
+                          onClick={() => setIsProfileDropdownOpen(false)}
+                          className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-sky-blue hover:bg-sky-blue/5 transition-all"
+                        >
+                          <Settings className="w-5 h-5" />
+                          <span className="text-sm font-medium">Settings</span>
+                        </Link>
+
+                        
+                        {/* Logout */}
+                        <motion.button
+                          whileHover={{ backgroundColor: '#fef2f2' }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={async () => {
+                            await logout()
+                            setIsProfileDropdownOpen(false)
+                            window.location.href = '/'
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-all"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          <span className="text-sm font-medium">Logout</span>
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               // Non-authenticated user actions
@@ -237,7 +244,7 @@ const Navbar = ({ variant = 'default' }) => {
                       <User className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <span className="text-sm font-semibold text-gray-900">{user.firstName}</span>
+                      <span className="text-sm font-semibold text-gray-900">{user.name}</span>
                       <span className="text-xs text-gray-500">{user.email}</span>
                     </div>
                   </div>
@@ -252,10 +259,8 @@ const Navbar = ({ variant = 'default' }) => {
                   </Link>
                   
                   <button
-                    onClick={() => {
-                      localStorage.removeItem('isAuthenticated')
-                      localStorage.removeItem('user')
-                      setUser(null)
+                    onClick={async () => {
+                      await logout()
                       setIsMobileMenuOpen(false)
                       window.location.href = '/'
                     }}

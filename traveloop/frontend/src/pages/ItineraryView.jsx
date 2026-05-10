@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Link, useParams } from 'react-router-dom'
-import { 
-  MapPin, 
-  Clock, 
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import {
+  MapPin,
+  Clock,
   Calendar,
   ArrowRight,
   Share2,
@@ -20,174 +20,81 @@ import {
   Navigation,
   CheckCircle
 } from 'lucide-react'
+import { tripApi } from '../api/tripApi'
 
 const ItineraryView = () => {
   const { tripId } = useParams()
+  const navigate = useNavigate()
   const [selectedDay, setSelectedDay] = useState(1)
   const [isLiked, setIsLiked] = useState(false)
+  const [trip, setTrip] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const itinerary = {
-    title: 'Paris Adventure 2024',
-    destination: 'Paris, France',
-    dates: 'March 15-22, 2024',
-    image: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=1200&h=400&fit=crop',
-    rating: 4.8,
-    totalActivities: 16,
-    estimatedBudget: '$3,500',
-    travelers: 2,
-    days: [
-      {
-        id: 1,
-        day: 1,
-        date: 'March 15, 2024',
-        theme: 'Arrival & Exploration',
-        activities: [
-          { 
-            time: '09:00', 
-            activity: 'Arrival at Charles de Gaulle Airport', 
-            location: 'CDG Airport',
-            type: 'transport',
-            duration: '2 hours',
-            notes: 'Airport pickup and transfer to hotel'
-          },
-          { 
-            time: '11:00', 
-            activity: 'Check-in at Hotel Le Marais', 
-            location: 'Hotel Le Marais',
-            type: 'accommodation',
-            duration: '1 hour',
-            notes: 'Boutique hotel in historic district'
-          },
-          { 
-            time: '13:00', 
-            activity: 'Lunch at Café de Flore', 
-            location: 'Saint-Germain-des-Prés',
-            type: 'dining',
-            duration: '1.5 hours',
-            notes: 'Famous historic café with French cuisine'
-          },
-          { 
-            time: '15:00', 
-            activity: 'Visit Louvre Museum', 
-            location: 'Louvre Museum',
-            type: 'sightseeing',
-            duration: '3 hours',
-            notes: 'See Mona Lisa and Venus de Milo'
-          },
-          { 
-            time: '19:00', 
-            activity: 'Dinner Cruise on Seine River', 
-            location: 'Seine River',
-            type: 'dining',
-            duration: '2 hours',
-            notes: 'Romantic dinner with illuminated city views'
-          }
-        ]
-      },
-      {
-        id: 2,
-        day: 2,
-        date: 'March 16, 2024',
-        theme: 'Iconic Paris',
-        activities: [
-          { 
-            time: '08:00', 
-            activity: 'Breakfast at Hotel', 
-            location: 'Hotel Le Marais',
-            type: 'dining',
-            duration: '1 hour'
-          },
-          { 
-            time: '09:30', 
-            activity: 'Eiffel Tower Visit', 
-            location: 'Champ de Mars',
-            type: 'sightseeing',
-            duration: '2.5 hours',
-            notes: 'Skip-the-line tickets, summit access'
-          },
-          { 
-            time: '12:30', 
-            activity: 'Lunch at Champ de Mars', 
-            location: 'Eiffel Tower Area',
-            type: 'dining',
-            duration: '1 hour',
-            notes: 'Picnic style lunch with tower views'
-          },
-          { 
-            time: '14:00', 
-            activity: 'Arc de Triomphe & Champs-Élysées', 
-            location: 'Charles de Gaulle Square',
-            type: 'sightseeing',
-            duration: '2 hours',
-            notes: 'Climb to top for panoramic views'
-          },
-          { 
-            time: '16:30', 
-            activity: 'Shopping on Champs-Élysées', 
-            location: 'Champs-Élysées',
-            type: 'shopping',
-            duration: '2 hours',
-            notes: 'Luxury shopping and cafés'
-          },
-          { 
-            time: '19:30', 
-            activity: 'Dinner in Montmartre', 
-            location: 'Montmartre',
-            type: 'dining',
-            duration: '2 hours',
-            notes: 'Traditional French restaurant'
-          }
-        ]
-      },
-      {
-        id: 3,
-        day: 3,
-        date: 'March 17, 2024',
-        theme: 'Royal Versailles',
-        activities: [
-          { 
-            time: '09:00', 
-            activity: 'Day Trip to Versailles', 
-            location: 'Palace of Versailles',
-            type: 'transport',
-            duration: '1 hour',
-            notes: 'Train ride through French countryside'
-          },
-          { 
-            time: '10:00', 
-            activity: 'Palace Tour', 
-            location: 'Palace of Versailles',
-            type: 'sightseeing',
-            duration: '3 hours',
-            notes: 'Hall of Mirrors, King\'s Apartments'
-          },
-          { 
-            time: '13:00', 
-            activity: 'Lunch in Versailles Gardens', 
-            location: 'Versailles Gardens',
-            type: 'dining',
-            duration: '1.5 hours',
-            notes: 'Outdoor café with garden views'
-          },
-          { 
-            time: '15:00', 
-            activity: 'Explore Gardens & Marie Antoinette\'s Estate', 
-            location: 'Versailles Gardens',
-            type: 'sightseeing',
-            duration: '2.5 hours',
-            notes: 'Grand Trianon and Petit Trianon'
-          },
-          { 
-            time: '18:00', 
-            activity: 'Return to Paris', 
-            location: 'Paris',
-            type: 'transport',
-            duration: '1 hour'
-          }
-        ]
+  useEffect(() => {
+    const fetchTrip = async () => {
+      try {
+        setLoading(true)
+        const response = await tripApi.getTrip(tripId)
+        setTrip(response.data)
+      } catch (err) {
+        console.error('Failed to fetch trip:', err)
+        setError('Failed to load trip details')
+      } finally {
+        setLoading(false)
       }
-    ]
+    }
+
+    if (tripId) {
+      fetchTrip()
+    }
+  }, [tripId])
+
+  const formatTripData = (tripData) => {
+    if (!tripData) return null
+
+    // Format stops into days with activities
+    const days = tripData.stops?.map((stop, index) => ({
+      id: stop.id || index + 1,
+      day: index + 1,
+      date: new Date(stop.date || tripData.startDate).toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+      }),
+      theme: stop.title || `Day ${index + 1}`,
+      activities: stop.activities?.map(activity => ({
+        time: activity.time || '09:00',
+        activity: activity.title || 'Activity',
+        location: activity.location || 'Location',
+        type: activity.type || 'sightseeing',
+        duration: activity.duration || '1 hour',
+        notes: activity.description || ''
+      })) || []
+    })) || []
+
+    return {
+      title: tripData.title || 'Untitled Trip',
+      destination: tripData.destination || 'Unknown Destination',
+      dates: `${new Date(tripData.startDate).toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+      })} - ${new Date(tripData.endDate).toLocaleDateString('en-US', { 
+        month: 'long', 
+        day: 'numeric', 
+        year: 'numeric' 
+      })}`,
+      image: tripData.coverImage || 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=1200&h=400&fit=crop',
+      rating: tripData.rating || 4.5,
+      totalActivities: days.reduce((sum, day) => sum + day.activities.length, 0),
+      estimatedBudget: `₹${tripData.budget?.toLocaleString('en-IN') || '0'}`,
+      travelers: tripData.travelers || 1,
+      days
+    }
   }
+
+  const itinerary = formatTripData(trip)
 
   const getActivityIcon = (type) => {
     switch (type) {
@@ -209,6 +116,57 @@ const ItineraryView = () => {
       case 'transport': return 'from-indigo-500 to-blue-500'
       default: return 'from-gray-500 to-gray-600'
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="flex justify-center items-center space-x-2 mb-4">
+            <div className="w-3 h-3 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+            <div className="w-3 h-3 bg-sky-blue rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          </div>
+          <p className="text-gray-600">Loading trip details...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Plane className="w-12 h-12 text-red-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">Trip Not Found</h3>
+          <p className="text-gray-600 mb-8">{error}</p>
+          <Link
+            to="/dashboard/my-trips"
+            className="px-6 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-xl font-semibold hover:shadow-lg flex items-center mx-auto"
+          >
+            Back to My Trips
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (!itinerary) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center">
+        <div className="text-center">
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">No Trip Data</h3>
+          <Link
+            to="/dashboard/my-trips"
+            className="px-6 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-xl font-semibold hover:shadow-lg flex items-center mx-auto"
+          >
+            Back to My Trips
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (

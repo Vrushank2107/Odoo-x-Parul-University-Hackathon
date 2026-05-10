@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
-import { 
+import { useAuth } from '../hooks/useAuth'
+import {
   Home,
   MapPin,
   Calendar,
@@ -19,24 +20,37 @@ import {
   Shield,
   LogOut,
   Bell,
-  Globe
+  Globe,
+  Car,
+  Users,
+  Camera,
+  Star,
+  HelpCircle,
+  MessageSquare,
+  BookOpen,
+  ChevronUp
 } from 'lucide-react'
 
-const Sidebar = ({ isCollapsed, onToggle }) => {
+const Sidebar = React.memo(({ isCollapsed, onToggle }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const [user, setUser] = useState(null)
-  const [userRole, setUserRole] = useState('user')
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
+  const { user, logout } = useAuth()
   const location = useLocation()
+  const dropdownRef = useRef(null)
 
-  // Simulate authentication state
+  const userRole = user?.role || 'user'
+
+  // Close dropdown when clicking outside
   useEffect(() => {
-    // In real app, this would come from auth context
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
-    const userData = localStorage.getItem('user')
-    if (isAuthenticated && userData) {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
-      setUserRole(parsedUser.role || 'user')
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
 
@@ -51,8 +65,15 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
     }
   ]
 
-  // Authenticated menu items (only when logged in)
+  // Authenticated menu items (only when logged in) - All pages included + more options
   const authMenuItems = [
+    {
+      group: 'Navigation',
+      items: [
+        { path: '/', label: 'Home', icon: Home, visible: true, requiresAuth: false },
+        { path: '/shared/sample', label: 'Shared Trip', icon: Globe, visible: true, requiresAuth: false },
+      ]
+    },
     {
       group: 'Main',
       items: [
@@ -105,43 +126,40 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       <div className="p-6 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <motion.div
-              whileHover={{ rotate: 12 }}
-              transition={{ type: "spring", stiffness: 300 }}
+            <div
+              className="cursor-pointer hover:rotate-12 transition-transform"
+              onClick={() => !isCollapsed && onToggle()}
             >
               <Plane className="w-8 h-8 text-sky-blue" />
-            </motion.div>
-            <AnimatePresence>
-              {!isCollapsed && (
-                <motion.span
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-xl font-bold text-gradient"
-                >
-                  Traveloop
-                </motion.span>
-              )}
-            </AnimatePresence>
+            </div>
+            {!isCollapsed && (
+              <span className="text-xl font-bold text-gradient">
+                Traveloop
+              </span>
+            )}
           </div>
           
           {/* Desktop Toggle */}
-          <button
-            onClick={onToggle}
-            className="hidden lg:flex p-2 rounded-lg text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 transition-all"
-          >
-            {isCollapsed ? (
-              <Menu className="w-5 h-5" />
-            ) : (
+          {!isCollapsed ? (
+            <button
+              onClick={onToggle}
+              className="hidden lg:flex p-2 rounded-lg text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 transition-all"
+            >
               <X className="w-5 h-5" />
-            )}
-          </button>
+            </button>
+          ) : (
+            <button
+              onClick={onToggle}
+              className="hidden lg:flex p-2 rounded-lg text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 transition-all"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto">
+      <nav className="flex-1 px-4 py-6 space-y-6 overflow-y-auto min-h-0">
         {menuItems.map((group) => {
           // Filter group items based on visibility and auth requirements
           const visibleItems = group.items.filter(item => {
@@ -156,19 +174,11 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
 
           return (
             <div key={group.group} className="space-y-2">
-              <AnimatePresence>
-                {!isCollapsed && (
-                  <motion.h3
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider"
-                  >
-                    {group.group}
-                  </motion.h3>
-                )}
-              </AnimatePresence>
+              {!isCollapsed && (
+                <h3 className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  {group.group}
+                </h3>
+              )}
               
               {visibleItems.map((item) => {
                 const Icon = item.icon
@@ -185,35 +195,18 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                         : 'text-gray-600 hover:text-sky-blue hover:bg-sky-blue/5'
                     }`}
                   >
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ type: "spring", stiffness: 400 }}
-                    >
+                    <div className="hover:scale-110 transition-transform">
                       <Icon className={`w-5 h-5 ${isActive ? 'text-sky-blue' : 'text-gray-500'}`} />
-                    </motion.div>
-                    
-                    <AnimatePresence>
-                      {!isCollapsed && (
-                        <motion.span
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -10 }}
-                          transition={{ duration: 0.2 }}
-                          className="ml-3"
-                        >
-                          {item.label}
-                        </motion.span>
-                      )}
-                    </AnimatePresence>
-                    
+                    </div>
+
+                    {!isCollapsed && (
+                      <span className="ml-3">
+                        {item.label}
+                      </span>
+                    )}
+
                     {isActive && !isCollapsed && (
-                      <motion.div
-                        layoutId="activeTab"
-                        className="ml-auto w-2 h-2 bg-sky-blue rounded-full"
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 500 }}
-                      />
+                      <div className="ml-auto w-2 h-2 bg-sky-blue rounded-full" />
                     )}
                   </Link>
                 )
@@ -224,87 +217,117 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t border-gray-100">
+      <div className="p-4 border-t border-gray-100 flex-shrink-0">
         {user ? (
-          <AnimatePresence>
+          <div ref={dropdownRef} className="relative">
             {!isCollapsed && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-3"
-              >
-                <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-sky-blue/5 to-cyan/5 rounded-xl">
-                  <div className="w-10 h-10 bg-gradient-to-r from-sky-blue to-cyan rounded-full flex items-center justify-center">
-                    <User className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 truncate">
-                      {user.firstName} {user.lastName}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {user.email}
-                    </p>
-                  </div>
+              <div>
+                  <button
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    className="w-full flex items-center space-x-3 p-3 bg-gradient-to-r from-sky-blue/5 to-cyan/5 rounded-xl hover:from-sky-blue/10 hover:to-cyan/10 transition-all"
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-r from-sky-blue to-cyan rounded-full flex items-center justify-center flex-shrink-0">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                    <ChevronUp className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isProfileDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Profile Dropdown Menu - Drop Up */}
+                  {isProfileDropdownOpen && (
+                    <div className="absolute left-0 right-0 bottom-full mb-2 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                      <div className="py-2">
+                        {/* Settings */}
+                        <Link
+                          to="/dashboard/profile"
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false)
+                            setIsMobileOpen(false)
+                          }}
+                          className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-sky-blue hover:bg-sky-blue/5 transition-all"
+                        >
+                          <Settings className="w-5 h-5" />
+                          <span className="text-sm font-medium">Settings</span>
+                        </Link>
+
+                        {/* Logout */}
+                        <button
+                          onClick={async () => {
+                            await logout()
+                            setIsProfileDropdownOpen(false)
+                            setIsMobileOpen(false)
+                            window.location.href = '/'
+                          }}
+                          className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-all"
+                        >
+                          <LogOut className="w-5 h-5" />
+                          <span className="text-sm font-medium">Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                
-                <div className="flex gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex-1 p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all relative"
-                  >
-                    <Bell className="w-4 h-4" />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                  </motion.button>
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex-1 p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </motion.button>
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      localStorage.removeItem('isAuthenticated')
-                      localStorage.removeItem('user')
-                      setUser(null)
-                      setUserRole('user')
-                      window.location.href = '/'
-                    }}
-                    className="flex-1 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </motion.button>
-                </div>
-              </motion.div>
             )}
-          </AnimatePresence>
+
+            {isCollapsed && (
+              <button
+                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                className="flex justify-center w-full hover:scale-105 active:scale-95 transition-transform"
+              >
+                <div className="w-10 h-10 bg-gradient-to-r from-sky-blue to-cyan rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+              </button>
+            )}
+
+            {/* Collapsed dropdown */}
+            {isCollapsed && isProfileDropdownOpen && (
+              <div className="absolute left-full bottom-0 ml-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                    <div className="py-2">
+                      <Link
+                        to="/dashboard/profile"
+                        onClick={() => {
+                          setIsProfileDropdownOpen(false)
+                          setIsMobileOpen(false)
+                        }}
+                        className="flex items-center space-x-3 px-4 py-3 text-gray-700 hover:text-sky-blue hover:bg-sky-blue/5 transition-all"
+                      >
+                        <Settings className="w-5 h-5" />
+                        <span className="text-sm font-medium">Settings</span>
+                      </Link>
+                      <button
+                        onClick={async () => {
+                          await logout()
+                          setIsProfileDropdownOpen(false)
+                          setIsMobileOpen(false)
+                          window.location.href = '/'
+                        }}
+                        className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-all"
+                      >
+                        <LogOut className="w-5 h-5" />
+                        <span className="text-sm font-medium">Logout</span>
+                      </button>
+                    </div>
+              </div>
+            )}
+          </div>
         ) : (
           // Non-authenticated state
           <div className="text-center">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={() => window.location.href = '/login'}
-              className="w-full px-4 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+              className="w-full px-4 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-xl font-semibold hover:shadow-lg transition-all hover:scale-105 active:scale-95"
             >
-              <User className="w-5 h-5 mr-2" />
+              <User className="w-5 h-5 mr-2 inline" />
               Sign In to Access More Features
-            </motion.button>
-          </div>
-        )}
-        
-        {isCollapsed && user && (
-          <div className="flex justify-center">
-            <div className="w-10 h-10 bg-gradient-to-r from-sky-blue to-cyan rounded-full flex items-center justify-center">
-              <User className="w-5 h-5 text-white" />
-            </div>
+            </button>
           </div>
         )}
       </div>
@@ -354,6 +377,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       </button>
     </>
   )
-}
+})
 
 export default Sidebar
