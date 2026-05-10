@@ -39,7 +39,7 @@ const Home = () => {
       id: 3,
       title: "Share Your Journey",
       subtitle: "Connect with travelers and discover hidden gems worldwide",
-      image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1200&h=800&fit=crop",
+      image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop",
       cta: "Join Community"
     }
   ]
@@ -50,7 +50,7 @@ const Home = () => {
       name: "Bali, Indonesia",
       description: "Tropical paradise with stunning beaches and vibrant culture",
       image: "https://images.unsplash.com/photo-1537953764746-f6e532f4dbaf?w=400&h=300&fit=crop",
-      price: "$1,299",
+      price: "₹1,08,000",
       rating: 4.8,
       duration: "7 days"
     },
@@ -59,7 +59,7 @@ const Home = () => {
       name: "Paris, France",
       description: "City of lights with timeless romance and art",
       image: "https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=300&fit=crop",
-      price: "$2,199",
+      price: "₹1,83,000",
       rating: 4.9,
       duration: "5 days"
     },
@@ -68,7 +68,7 @@ const Home = () => {
       name: "Tokyo, Japan",
       description: "Modern metropolis blending tradition with innovation",
       image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&h=300&fit=crop",
-      price: "$2,599",
+      price: "₹2,16,000",
       rating: 4.7,
       duration: "6 days"
     },
@@ -77,7 +77,7 @@ const Home = () => {
       name: "New York, USA",
       description: "The city that never sleeps with endless possibilities",
       image: "https://images.unsplash.com/photo-1496442226666-8274e0d47c5a?w=400&h=300&fit=crop",
-      price: "$1,899",
+      price: "₹1,58,000",
       rating: 4.6,
       duration: "4 days"
     }
@@ -162,6 +162,9 @@ const Home = () => {
                 src={slide.image}
                 alt={slide.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop";
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60" />
             </motion.div>

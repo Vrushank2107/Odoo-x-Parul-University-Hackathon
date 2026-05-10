@@ -42,7 +42,7 @@ const EmptyState = ({
         gradient: 'from-green-500 to-teal-500'
       },
       budget: {
-        icon: DollarSign,
+        icon: TrendingUp,
         title: title || 'No budget data',
         description: description || 'Start tracking your expenses to see budget insights',
         actionText: actionText || 'Add Expenses',

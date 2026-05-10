@@ -6,7 +6,6 @@ import {
   Users, 
   MapPin,
   Calendar,
-  DollarSign,
   Plane,
   Star
 } from 'lucide-react'
@@ -28,7 +27,6 @@ const StatsCard = ({
       users: Users,
       mapPin: MapPin,
       calendar: Calendar,
-      dollarSign: DollarSign,
       plane: Plane,
       star: Star
     }

@@ -5,7 +5,6 @@ import {
   MapPin, 
   Calendar, 
   Users, 
-  DollarSign,
   Star,
   Heart,
   Share2,
@@ -148,10 +147,10 @@ const TripCard = ({ trip, variant = 'default', onLike, onShare, onEdit, onDelete
         {budget && (
           <div className="flex items-center justify-between mb-4 p-3 bg-sky-blue/5 rounded-lg">
             <div className="flex items-center space-x-2">
-              <DollarSign className="w-4 h-4 text-sky-blue" />
+              <TrendingUp className="w-4 h-4 text-sky-blue" />
               <span className="text-sm font-semibold text-sky-blue">Budget</span>
             </div>
-            <span className="text-lg font-bold text-sky-blue">${budget}</span>
+            <span className="text-lg font-bold text-sky-blue">₹{budget}</span>
           </div>
         )}
 

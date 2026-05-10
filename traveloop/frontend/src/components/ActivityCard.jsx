@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { 
   MapPin, 
   Clock, 
-  DollarSign, 
   Star,
   Heart,
   Calendar,
@@ -151,8 +150,8 @@ const ActivityCard = ({ activity, variant = 'default', onSelect, onLike }) => {
         {/* Price */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <DollarSign className="w-4 h-4 text-sky-blue" />
-            <span className="text-lg font-bold text-sky-blue">${price || 0}</span>
+            <TrendingUp className="w-4 h-4 text-sky-blue" />
+            <span className="text-lg font-bold text-sky-blue">₹{price || 0}</span>
             <span className="text-sm text-gray-500">per person</span>
           </div>
           

@@ -17,9 +17,7 @@ const DashboardLayout = () => {
         onToggle={toggleSidebar}
       />
       
-      <div className={`flex-1 transition-all duration-300 ${
-        isSidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'
-      }`}>
+      <div className="flex-1 transition-all duration-300">
         <motion.main
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

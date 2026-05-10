@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Link, useLocation } from 'react-router-dom'
 import { 
@@ -9,19 +9,46 @@ import {
   Settings,
   MapPin,
   Calendar,
-  DollarSign
+  Package,
+  TrendingUp,
+  LogOut,
+  Bell,
+  Heart,
+  Globe
 } from 'lucide-react'
 
 const Navbar = ({ variant = 'default' }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [user, setUser] = useState(null)
   const location = useLocation()
 
-  const navItems = [
-    { path: '/', label: 'Home', icon: Plane },
-    { path: '/dashboard', label: 'Dashboard', icon: MapPin },
-    { path: '/dashboard/my-trips', label: 'My Trips', icon: Calendar },
-    { path: '/dashboard/budget', label: 'Budget', icon: DollarSign },
+  // Simulate authentication state
+  useEffect(() => {
+    // In real app, this would come from auth context
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true'
+    const userData = localStorage.getItem('user')
+    if (isAuthenticated && userData) {
+      setUser(JSON.parse(userData))
+    }
+  }, [])
+
+  // Public nav items (always visible)
+  const publicNavItems = [
+    { path: '/', label: 'Home', icon: Plane, visible: true },
+    { path: '/shared/:tripId', label: 'Shared Trip', icon: Globe, visible: true },
   ]
+
+  // Authenticated nav items (only when logged in)
+  const authNavItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: MapPin, visible: true },
+    { path: '/dashboard/my-trips', label: 'My Trips', icon: Calendar, visible: true },
+    { path: '/dashboard/itinerary-builder/sample', label: 'Itinerary Builder', icon: Calendar, visible: true },
+    { path: '/dashboard/budget', label: 'Budget', icon: TrendingUp, visible: true },
+    { path: '/dashboard/packing/sample', label: 'Packing List', icon: Package, visible: true },
+  ]
+
+  // Combine nav items based on auth state
+  const navItems = [...publicNavItems, ...(user ? authNavItems : [])]
 
   const isActivePath = (path) => {
     if (path === '/') {
@@ -59,7 +86,7 @@ const Navbar = ({ variant = 'default' }) => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => {
+            {navItems.filter(item => item.visible !== false).map((item) => {
               const Icon = item.icon
               return (
                 <Link
@@ -67,7 +94,7 @@ const Navbar = ({ variant = 'default' }) => {
                   to={item.path}
                   className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
                     isActivePath(item.path)
-                      ? 'bg-sky-blue/10 text-sky-blue font-semibold'
+                      ? 'bg-gradient-to-r from-sky-blue/10 to-cyan/10 text-sky-blue font-semibold shadow-sm'
                       : 'text-gray-600 hover:text-sky-blue hover:bg-sky-blue/5'
                   }`}
                 >
@@ -80,32 +107,81 @@ const Navbar = ({ variant = 'default' }) => {
 
           {/* User Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <div className="flex items-center space-x-3">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center space-x-2 px-4 py-2 bg-sky-blue/10 rounded-lg"
-              >
-                <User className="w-4 h-4 text-sky-blue" />
-                <span className="text-sm font-medium text-sky-blue">
-                  Demo User
-                </span>
-              </motion.div>
-              
-              <Link
-                to="/dashboard/profile"
-                className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all"
-              >
-                <Settings className="w-5 h-5" />
-              </Link>
-              
-              <Link
-                to="/login"
-                className="flex items-center space-x-2 px-4 py-2 bg-sky-blue/10 text-sky-blue rounded-lg hover:bg-sky-blue/20 transition-all"
-              >
-                <User className="w-4 h-4" />
-                <span className="text-sm font-medium">Login</span>
-              </Link>
-            </div>
+            {user ? (
+              // Authenticated user actions
+              <div className="flex items-center space-x-3">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-sky-blue/10 to-cyan/10 rounded-lg"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-r from-sky-blue to-cyan rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-gray-900">{user.firstName}</span>
+                    <span className="text-xs text-gray-500">{user.email}</span>
+                  </div>
+                </motion.div>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all relative"
+                >
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all"
+                >
+                  <Heart className="w-5 h-5" />
+                </motion.button>
+                
+                <Link
+                  to="/dashboard/profile"
+                  className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all"
+                >
+                  <Settings className="w-5 h-5" />
+                </Link>
+                
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => {
+                    localStorage.removeItem('isAuthenticated')
+                    localStorage.removeItem('user')
+                    setUser(null)
+                    window.location.href = '/'
+                  }}
+                  className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm font-medium">Logout</span>
+                </motion.button>
+              </div>
+            ) : (
+              // Non-authenticated user actions
+              <div className="flex items-center space-x-3">
+                <Link
+                  to="/login"
+                  className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-lg hover:shadow-lg transition-all"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-sm font-medium">Sign In</span>
+                </Link>
+                
+                <Link
+                  to="/signup"
+                  className="flex items-center space-x-2 px-4 py-2 border-2 border-sky-blue text-sky-blue rounded-lg hover:bg-sky-blue/10 transition-all"
+                >
+                  <User className="w-4 h-4" />
+                  <span className="text-sm font-medium">Sign Up</span>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -133,7 +209,7 @@ const Navbar = ({ variant = 'default' }) => {
             className="md:hidden bg-white border-t border-gray-100"
           >
             <div className="px-4 py-6 space-y-4">
-              {navItems.map((item) => {
+              {navItems.filter(item => item.visible !== false).map((item) => {
                 const Icon = item.icon
                 return (
                   <Link
@@ -142,7 +218,7 @@ const Navbar = ({ variant = 'default' }) => {
                     onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       isActivePath(item.path)
-                        ? 'bg-sky-blue/10 text-sky-blue font-semibold'
+                        ? 'bg-gradient-to-r from-sky-blue/10 to-cyan/10 text-sky-blue font-semibold'
                         : 'text-gray-600 hover:text-sky-blue hover:bg-sky-blue/5'
                     }`}
                   >
@@ -153,32 +229,64 @@ const Navbar = ({ variant = 'default' }) => {
               })}
               
               <div className="border-t border-gray-100 pt-4">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3 px-4 py-3 bg-sky-blue/10 rounded-lg">
-                  <User className="w-5 h-5 text-sky-blue" />
-                  <span className="text-sm font-medium text-sky-blue">
-                    Demo User
-                  </span>
+              {user ? (
+                // Authenticated mobile menu
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-sky-blue/10 to-cyan/10 rounded-lg">
+                    <div className="w-10 h-10 bg-gradient-to-r from-sky-blue to-cyan rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <span className="text-sm font-semibold text-gray-900">{user.firstName}</span>
+                      <span className="text-xs text-gray-500">{user.email}</span>
+                    </div>
+                  </div>
+                  
+                  <Link
+                    to="/dashboard/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/5 rounded-lg transition-all"
+                  >
+                    <Settings className="w-5 h-5" />
+                    <span>Profile</span>
+                  </Link>
+                  
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('isAuthenticated')
+                      localStorage.removeItem('user')
+                      setUser(null)
+                      setIsMobileMenuOpen(false)
+                      window.location.href = '/'
+                    }}
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    <span>Logout</span>
+                  </button>
                 </div>
-                
-                <Link
-                  to="/dashboard/profile"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/5 rounded-lg transition-all"
-                >
-                  <Settings className="w-5 h-5" />
-                  <span>Profile</span>
-                </Link>
-                
-                <Link
-                  to="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full flex items-center space-x-3 px-4 py-3 bg-sky-blue/10 text-sky-blue rounded-lg hover:bg-sky-blue/20 transition-all"
-                >
-                  <User className="w-5 h-5" />
-                  <span>Login</span>
-                </Link>
-              </div>
+              ) : (
+                // Non-authenticated mobile menu
+                <div className="space-y-3">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-sky-blue to-cyan text-white rounded-lg hover:shadow-lg transition-all"
+                  >
+                    <User className="w-5 h-5" />
+                    <span>Sign In</span>
+                  </Link>
+                  
+                  <Link
+                    to="/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full flex items-center space-x-3 px-4 py-3 border-2 border-sky-blue text-sky-blue rounded-lg hover:bg-sky-blue/10 transition-all"
+                  >
+                    <User className="w-5 h-5" />
+                    <span>Sign Up</span>
+                  </Link>
+                </div>
+              )}
             </div>
             </div>
           </motion.div>

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { Plane } from 'lucide-react'
 import Navbar from '../components/Navbar'
 
 const MainLayout = () => {
@@ -24,9 +25,7 @@ const MainLayout = () => {
             {/* Company */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-sky-blue to-cyan rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">T</span>
-                </div>
+                <Plane className="w-8 h-8 text-sky-blue" />
                 <span className="text-xl font-bold text-gradient">Traveloop</span>
               </div>
               <p className="text-sm text-gray-600">
@@ -104,7 +103,7 @@ const MainLayout = () => {
           <div className="mt-8 pt-8 border-t border-gray-100">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <p className="text-sm text-gray-600">
-                © 2024 Traveloop. All rights reserved.
+                © 2026 Traveloop. All rights reserved.
               </p>
               <div className="flex space-x-6 mt-4 md:mt-0">
                 <a href="#" className="text-gray-400 hover:text-sky-blue transition-colors">
