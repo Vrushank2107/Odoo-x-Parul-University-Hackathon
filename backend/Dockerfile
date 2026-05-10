@@ -1,17 +1,17 @@
-# Use Node.js 18 Alpine as base image
-FROM node:18-alpine
+# Use Node.js 20 Alpine as base image
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Install OpenSSL and other dependencies required by Prisma
-RUN apk add --no-cache openssl1.1-compat
+# Install dependencies required by Prisma and healthcheck
+RUN apk add --no-cache openssl curl wget
 
 # Copy package files
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy source code
 COPY . .

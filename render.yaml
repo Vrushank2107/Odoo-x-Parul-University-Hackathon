@@ -8,8 +8,8 @@ services:
     name: traveloop-backend
     env: docker
     plan: free
-    dockerContext: .
-    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
     autoDeploy: true
     healthCheckPath: /health
     envVars:

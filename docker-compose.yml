@@ -1,1 +1,51 @@
+version: "3.9"
 
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: traveloop-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: traveloop_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d traveloop_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: traveloop-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres123@postgres:5432/traveloop_db
+      JWT_SECRET: change-me-in-production
+      JWT_REFRESH_SECRET: change-me-in-production
+      NODE_ENV: production
+      PORT: 5000
+      FRONTEND_URL: http://localhost:5173
+    ports:
+      - "5000:5000"
+    volumes:
+      - backend_uploads:/app/src/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+volumes:
+  postgres_data:
+  backend_uploads:
