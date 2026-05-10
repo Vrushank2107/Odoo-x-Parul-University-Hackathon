@@ -19,8 +19,15 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token')
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      // For development: Auto-login if token exists
+      setUser({
+        id: 1,
+        name: 'Test User',
+        email: 'test@example.com'
+      })
+      setLoading(false)
       // Verify token with backend
-      verifyToken()
+      // verifyToken()
     } else {
       setLoading(false)
     }
@@ -40,12 +47,17 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password })
-      const { token, user } = response.data
+      // For development: Mock login without backend
+      const mockToken = 'mock-jwt-token-' + Date.now()
+      const mockUser = {
+        id: 1,
+        name: 'Test User',
+        email: email
+      }
       
-      localStorage.setItem('token', token)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      setUser(user)
+      localStorage.setItem('token', mockToken)
+      // axios.defaults.headers.common['Authorization'] = `Bearer ${mockToken}`
+      setUser(mockUser)
       
       return { success: true }
     } catch (error) {

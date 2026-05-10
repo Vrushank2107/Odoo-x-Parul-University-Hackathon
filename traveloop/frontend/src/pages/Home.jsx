@@ -111,6 +111,7 @@ const Home = () => {
   ]
 
   useEffect(() => {
+    // Activate automatic slide rotation
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
     }, 5000)
@@ -186,7 +187,7 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link
                   to="/signup"
-                  className="btn-primary bg-white text-deep-blue hover:bg-gray-100 px-8 py-4 text-lg"
+                  className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg inline-flex items-center"
                 >
                   {heroSlides[currentSlide].cta}
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -334,9 +335,10 @@ const Home = () => {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="text-sky-blue font-semibold text-sm hover:text-sky-blue/80"
+                      className="bg-sky-blue text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-sky-blue/90 flex items-center"
                     >
-                      Explore →
+                      Explore
+                      <ArrowRight className="w-4 h-4 ml-2" />
                     </motion.button>
                   </div>
                 </div>
@@ -347,7 +349,7 @@ const Home = () => {
           <div className="text-center mt-12">
             <Link
               to="/city-search"
-              className="btn-secondary"
+              className="bg-sky-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-blue/90 transition-all flex items-center"
             >
               View All Destinations
               <ArrowRight className="w-4 h-4 ml-2" />
@@ -427,7 +429,7 @@ const Home = () => {
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <Link
                 to="/signup"
-                className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg"
+                className="bg-white text-sky-blue px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all text-lg inline-flex items-center"
               >
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -435,9 +437,10 @@ const Home = () => {
               
               <Link
                 to="/dashboard/create-trip"
-                className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all text-lg"
+                className="border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all text-lg inline-flex items-center"
               >
                 Plan a Trip
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
             </div>
           </motion.div>

@@ -61,9 +61,10 @@ const Profile = () => {
             </div>
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
             >
               {isEditing ? 'Cancel' : 'Edit Profile'}
+              <ArrowRight className="w-4 h-4 ml-2" />
             </button>
           </div>
 
@@ -210,16 +211,18 @@ const Profile = () => {
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700"
+                  className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 flex items-center justify-center"
                 >
                   Save Changes
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300"
+                  className="px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 flex items-center justify-center"
                 >
                   Cancel
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
               </div>
             )}

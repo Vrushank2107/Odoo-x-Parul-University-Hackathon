@@ -151,15 +151,17 @@ const CreateTrip = () => {
             <div className="flex gap-4">
               <button
                 type="submit"
-                className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
               >
                 Create Trip
+                <ArrowRight className="w-4 h-4 ml-2" />
               </button>
               <button
                 type="button"
-                className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 flex items-center justify-center"
               >
                 Cancel
+                <ArrowRight className="w-4 h-4 ml-2" />
               </button>
             </div>
           </form>
