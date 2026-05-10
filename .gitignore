@@ -142,3 +142,5 @@ ENV/
 
 # Docker
 .dockerignore
+!.dockerignore
+!backend/.dockerignore

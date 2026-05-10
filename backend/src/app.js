@@ -37,15 +37,25 @@ app.use(helmet({
   },
 }))
 
+const allowedOrigins = new Set([
+  ...(config.frontendUrl || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean),
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:50702',
+  'http://localhost:5173'
+])
+
 // CORS configuration
 app.use(cors({
-  origin: [
-    config.frontendUrl,
-    'http://localhost:3000',
-    'http://localhost:3001',
-    'http://127.0.0.1:50702',
-    'http://localhost:5173'
-  ],
+  origin: (origin, callback) => {
+    // Allow non-browser requests and same-origin server requests
+    if (!origin) return callback(null, true)
+    if (allowedOrigins.has(origin)) return callback(null, true)
+    return callback(new Error(`CORS blocked for origin: ${origin}`))
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

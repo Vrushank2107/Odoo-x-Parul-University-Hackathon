@@ -1,0 +1,18 @@
+.git
+.gitignore
+.DS_Store
+node_modules
+npm-debug.log
+
+# Never bake local env into container images
+backend/.env
+frontend/.env
+**/.env
+**/.env.*
+
+# Local dev artifacts
+backend/node_modules
+frontend/node_modules
+dist
+build
+coverage

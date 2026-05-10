@@ -5,7 +5,7 @@
   "installCommand": "npm install",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "https://odoo-x-parul-university-hackathon.onrender.com/api",
+    "VITE_API_URL": "https://odoo-x-parul-university-hackathon-1.onrender.com/api",
     "VITE_NODE_ENV": "production"
   },
   "headers": [
