@@ -1,30 +1,20 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { 
   Menu, 
   X, 
   Plane, 
   User, 
-  LogOut, 
   Settings,
   MapPin,
   Calendar,
   DollarSign
 } from 'lucide-react'
-import { useAuth } from '../hooks/useAuth'
 
 const Navbar = ({ variant = 'default' }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { user, logout } = useAuth()
   const location = useLocation()
-  const navigate = useNavigate()
-
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-    setIsMobileMenuOpen(false)
-  }
 
   const navItems = [
     { path: '/', label: 'Home', icon: Plane },
@@ -90,51 +80,32 @@ const Navbar = ({ variant = 'default' }) => {
 
           {/* User Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <div className="flex items-center space-x-3">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center space-x-2 px-4 py-2 bg-sky-blue/10 rounded-lg"
-                >
-                  <User className="w-4 h-4 text-sky-blue" />
-                  <span className="text-sm font-medium text-sky-blue">
-                    {user.name || user.email}
-                  </span>
-                </motion.div>
-                
-                <Link
-                  to="/dashboard/profile"
-                  className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all"
-                >
-                  <Settings className="w-5 h-5" />
-                </Link>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleLogout}
-                  className="flex items-center space-x-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all"
-                >
-                  <LogOut className="w-4 h-4" />
-                  <span className="text-sm font-medium">Logout</span>
-                </motion.button>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link
-                  to="/login"
-                  className="px-4 py-2 text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all font-medium"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/signup"
-                  className="btn-primary"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
+            <div className="flex items-center space-x-3">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="flex items-center space-x-2 px-4 py-2 bg-sky-blue/10 rounded-lg"
+              >
+                <User className="w-4 h-4 text-sky-blue" />
+                <span className="text-sm font-medium text-sky-blue">
+                  Demo User
+                </span>
+              </motion.div>
+              
+              <Link
+                to="/dashboard/profile"
+                className="p-2 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all"
+              >
+                <Settings className="w-5 h-5" />
+              </Link>
+              
+              <Link
+                to="/login"
+                className="flex items-center space-x-2 px-4 py-2 bg-sky-blue/10 text-sky-blue rounded-lg hover:bg-sky-blue/20 transition-all"
+              >
+                <User className="w-4 h-4" />
+                <span className="text-sm font-medium">Login</span>
+              </Link>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -182,51 +153,33 @@ const Navbar = ({ variant = 'default' }) => {
               })}
               
               <div className="border-t border-gray-100 pt-4">
-                {user ? (
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-3 px-4 py-3 bg-sky-blue/10 rounded-lg">
-                      <User className="w-5 h-5 text-sky-blue" />
-                      <span className="text-sm font-medium text-sky-blue">
-                        {user.name || user.email}
-                      </span>
-                    </div>
-                    
-                    <Link
-                      to="/dashboard/profile"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/5 rounded-lg transition-all"
-                    >
-                      <Settings className="w-5 h-5" />
-                      <span>Profile</span>
-                    </Link>
-                    
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center space-x-3 px-4 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all"
-                    >
-                      <LogOut className="w-5 h-5" />
-                      <span>Logout</span>
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    <Link
-                      to="/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full px-4 py-3 text-center text-sky-blue hover:bg-sky-blue/10 rounded-lg transition-all font-medium"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/signup"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="block w-full btn-primary text-center"
-                    >
-                      Sign Up
-                    </Link>
-                  </div>
-                )}
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 px-4 py-3 bg-sky-blue/10 rounded-lg">
+                  <User className="w-5 h-5 text-sky-blue" />
+                  <span className="text-sm font-medium text-sky-blue">
+                    Demo User
+                  </span>
+                </div>
+                
+                <Link
+                  to="/dashboard/profile"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center space-x-3 px-4 py-3 text-gray-600 hover:text-sky-blue hover:bg-sky-blue/5 rounded-lg transition-all"
+                >
+                  <Settings className="w-5 h-5" />
+                  <span>Profile</span>
+                </Link>
+                
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full flex items-center space-x-3 px-4 py-3 bg-sky-blue/10 text-sky-blue rounded-lg hover:bg-sky-blue/20 transition-all"
+                >
+                  <User className="w-5 h-5" />
+                  <span>Login</span>
+                </Link>
               </div>
+            </div>
             </div>
           </motion.div>
         )}
