@@ -1,7 +1,6 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useAuth } from './hooks/useAuth'
 
 // Layouts
 import MainLayout from './layouts/MainLayout'
@@ -29,11 +28,6 @@ import AdminDashboard from './pages/AdminDashboard'
 import Loader from './components/Loader'
 
 function App() {
-  const { user, loading } = useAuth()
-
-  if (loading) {
-    return <Loader />
-  }
 
   return (
     <motion.div
@@ -43,19 +37,16 @@ function App() {
       className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50"
     >
       <Routes>
-        {/* Public Routes */}
+        {/* All Routes - No Authentication Required */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
-          <Route path="login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
-          <Route path="signup" element={!user ? <Signup /> : <Navigate to="/dashboard" />} />
+          <Route path="login" element={<Login />} />
+          <Route path="signup" element={<Signup />} />
           <Route path="shared/:tripId" element={<SharedTrip />} />
         </Route>
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={user ? <DashboardLayout /> : <Navigate to="/login" />}
-        >
+        {/* Dashboard Routes - Now Public */}
+        <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="create-trip" element={<CreateTrip />} />
           <Route path="my-trips" element={<MyTrips />} />

@@ -10,7 +10,6 @@ import {
   Search,
   Settings,
   User,
-  LogOut,
   Menu,
   X,
   Plane,
@@ -18,11 +17,9 @@ import {
   FileText,
   BarChart3
 } from 'lucide-react'
-import { useAuth } from '../hooks/useAuth'
 
 const Sidebar = ({ isCollapsed, onToggle }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
-  const { user, logout } = useAuth()
   const location = useLocation()
 
   const menuItems = [
@@ -64,11 +61,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
       return location.pathname === '/dashboard'
     }
     return location.pathname.startsWith(path)
-  }
-
-  const handleLogout = () => {
-    logout()
-    setIsMobileOpen(false)
   }
 
   const sidebarContent = (
@@ -198,10 +190,10 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
-                  {user?.name || user?.email || 'Guest'}
+                  Demo User
                 </p>
                 <p className="text-xs text-gray-500 truncate">
-                  {user?.email || 'Not logged in'}
+                  demo@traveloop.com
                 </p>
               </div>
             </motion.div>
@@ -215,22 +207,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             </div>
           </div>
         )}
-        
-        <AnimatePresence>
-          {!isCollapsed && (
-            <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.2, delay: 0.1 }}
-              onClick={handleLogout}
-              className="w-full mt-3 flex items-center justify-center space-x-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="text-sm font-medium">Logout</span>
-            </motion.button>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   )
