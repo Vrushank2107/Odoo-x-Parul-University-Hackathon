@@ -124,7 +124,7 @@ const MyTrips = () => {
     try {
       setLoading(true)
       const response = await tripApi.getTrips()
-      setTrips(response.data && response.data.length > 0 ? response.data : fallbackTrips)
+      setTrips(response.data?.data && response.data.data.length > 0 ? response.data.data : fallbackTrips)
     } catch (error) {
       console.error('Failed to fetch trips:', error)
       setTrips(fallbackTrips)
@@ -142,7 +142,7 @@ const MyTrips = () => {
           ...(searchQuery && { search: searchQuery })
         }
         const response = await tripApi.getTrips(params)
-        setTrips(response.data && response.data.length > 0 ? response.data : fallbackTrips)
+        setTrips(response.data?.data && response.data.data.length > 0 ? response.data.data : fallbackTrips)
       } catch (error) {
         console.error('Failed to fetch filtered trips:', error)
         setTrips(fallbackTrips)
