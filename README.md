@@ -16,6 +16,10 @@ A comprehensive travel planning application built for the Odoo x Parul Universit
 
 Traveloop is a modern full-stack travel planning application that helps users plan, organize, and share their travel experiences. The application features powerful tools for itinerary management, budget tracking, packing lists, and collaborative planning.
 
+## Live Demo
+
+- **Frontend**: [https://traveloop-tau.vercel.app/](https://traveloop-tau.vercel.app/)
+
 ## Tech Stack
 
 ### Frontend
