@@ -42,6 +42,7 @@ const allowedOrigins = new Set([
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean),
+  'http://localhost',
   'http://localhost:3000',
   'http://localhost:3001',
   'http://127.0.0.1:50702',
